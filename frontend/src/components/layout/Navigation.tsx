@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { ThemeToggle } from "../ui/ThemeToggle";
+import { ChevronLogo } from "../ui/ChevronLogo";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "../../data/portfolio";
 
@@ -61,6 +62,7 @@ export const Navigation: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 lg:px-8 h-full flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
+            <ChevronLogo size={28} className="text-primary" />
             <span className="text-lg font-serif font-bold tracking-tight text-text-primary">
               Edeh<span className="text-text-muted">.</span>
             </span>

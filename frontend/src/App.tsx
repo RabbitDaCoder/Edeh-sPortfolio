@@ -14,6 +14,7 @@ import { ScrollProgress } from "./components/ui/ScrollProgress";
 import { GlobalCanvas } from "./components/3d/GlobalCanvas";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { SectionError } from "./components/ui/SectionError";
+import { HomeSEO } from "./pages/HomeSEO";
 import "./index.css";
 
 function ScrollToTop() {
@@ -92,6 +93,7 @@ export function App() {
                   path="/"
                   element={
                     <div className="divide-y divide-border/10">
+                      <HomeSEO />
                       <HeroSection />
                       <AboutSection />
                       <ErrorBoundary fallback={<SectionError />}>

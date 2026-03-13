@@ -112,10 +112,10 @@ export const PERSONAL: Personal = {
   email: "edehchinedu59@gmail.com",
   location: "Nigeria",
   timezone: "WAT / UTC+1",
-  github: "https://github.com/Chinedu-E",
-  linkedin: "https://linkedin.com/in/edeh-chinedu-daniel",
-  youtube: "https://youtube.com/@edeh-chinedu",
-  twitter: "https://twitter.com/edeh_chinedu",
+  github: "https://github.com/RabbitDaCoder",
+  linkedin: "https://linkedin.com/in/edehchinedu20",
+  youtube: "https://www.youtube.com/@rabbitdacoder",
+  twitter: "https://x.com/EdehChinedu20",
 };
 
 // ─── SERVICES ────────────────────────────────────────────────────────

@@ -6,6 +6,10 @@ import { Section } from '../components/layout/Section';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { useSEO } from '../hooks/useSEO';
+import { SEO } from '../components/seo/SEO';
+import { JsonLD } from '../components/seo/JsonLD';
+import { bookSchema, breadcrumbSchema } from '../lib/schemas';
 
 export const BooksDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -29,11 +33,44 @@ export const BooksDetailPage: React.FC = () => {
     isbn: '123-456-789',
   };
 
+  const seo = useSEO({
+    title: book.title,
+    description: book.description,
+    canonical: `https://edehchinedu.dev/books/${slug}`,
+    ogType: 'book',
+    ogTitle: book.title,
+    ogDescription: book.description,
+    twitterTitle: book.title,
+    twitterDesc: book.description,
+    keywords: [
+      book.title,
+      'Edeh Chinedu Daniel',
+      'RabbitDaCoder Book',
+      'Engineering Book',
+    ],
+  });
+
   return (
     <PageWrapper
       title={`${book.title} | Books`}
       description={book.description}
     >
+      <SEO {...seo} />
+      <JsonLD
+        schema={bookSchema({
+          title: book.title,
+          slug: slug || '',
+          description: book.description,
+          price: 29.99,
+        })}
+      />
+      <JsonLD
+        schema={breadcrumbSchema([
+          { name: 'Home', url: 'https://edehchinedu.dev' },
+          { name: 'Books', url: 'https://edehchinedu.dev/books' },
+          { name: book.title, url: `https://edehchinedu.dev/books/${slug}` },
+        ])}
+      />
       <Section id="book-detail">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Left: Book cover and purchase */}

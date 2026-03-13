@@ -13,6 +13,10 @@ import { Badge } from "../components/ui/Badge";
 import { Copy, Check, Send, ArrowRight } from "lucide-react";
 import { PERSONAL } from "../data/portfolio";
 import { useProfile } from "../features/profile/hooks/useProfile";
+import { useSEO } from "../hooks/useSEO";
+import { SEO } from "../components/seo/SEO";
+import { JsonLD } from "../components/seo/JsonLD";
+import { contactPageSchema, breadcrumbSchema } from "../lib/schemas";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -86,11 +90,35 @@ export const ContactPage: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const seo = useSEO({
+    title: 'Contact — Work With Me',
+    description:
+      'Send a project proposal to Edeh Chinedu Daniel. Available for ' +
+      'freelance web development, IoT consulting, and full-time roles.',
+    canonical: 'https://edehchinedu.dev/contact',
+    ogType: 'website',
+    keywords: [
+      'Hire Full-Stack Developer Nigeria',
+      'Freelance Web Developer Enugu',
+      'React Developer for Hire',
+      'IoT Consultant Nigeria',
+      'Contact RabbitDaCoder',
+    ],
+  });
+
   return (
     <PageWrapper
       title="Contact | Edeh Chinedu Daniel"
       description="Get in touch about projects, opportunities, or just to chat."
     >
+      <SEO {...seo} />
+      <JsonLD schema={contactPageSchema()} />
+      <JsonLD
+        schema={breadcrumbSchema([
+          { name: 'Home', url: 'https://edehchinedu.dev' },
+          { name: 'Contact', url: 'https://edehchinedu.dev/contact' },
+        ])}
+      />
       <Section id="contact">
         <div className="space-y-16">
           {/* Header */}

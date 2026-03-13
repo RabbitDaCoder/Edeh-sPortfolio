@@ -5,6 +5,10 @@ import { Section } from '../components/layout/Section';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
+import { useSEO } from '../hooks/useSEO';
+import { SEO } from '../components/seo/SEO';
+import { JsonLD } from '../components/seo/JsonLD';
+import { breadcrumbSchema } from '../lib/schemas';
 
 export const BooksPage: React.FC = () => {
   const books = Array.from({ length: 12 }, (_, i) => ({
@@ -16,11 +20,33 @@ export const BooksPage: React.FC = () => {
     price: '$29.99',
   }));
 
+  const seo = useSEO({
+    title: 'Books — Recommended Reading',
+    description:
+      'Books recommended and written by Edeh Chinedu Daniel on ' +
+      'software engineering, product building, and creative technology.',
+    canonical: 'https://edehchinedu.dev/books',
+    ogType: 'website',
+    keywords: [
+      'Engineering Books',
+      'Software Development Books',
+      'RabbitDaCoder Reading List',
+      'Tech Books Nigeria',
+    ],
+  });
+
   return (
     <PageWrapper
       title="Books | Edeh Chinedu Daniel"
       description="My published books on web development, design systems, and JavaScript."
     >
+      <SEO {...seo} />
+      <JsonLD
+        schema={breadcrumbSchema([
+          { name: 'Home', url: 'https://edehchinedu.dev' },
+          { name: 'Books', url: 'https://edehchinedu.dev/books' },
+        ])}
+      />
       <Section id="books-page">
         <div className="space-y-12">
           <div>

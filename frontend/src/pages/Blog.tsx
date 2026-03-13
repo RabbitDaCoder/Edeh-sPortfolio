@@ -6,6 +6,10 @@ import { FeaturedPost } from "../components/blog/FeaturedPost";
 import { BlogFilters } from "../components/blog/BlogFilters";
 import { BlogGrid } from "../components/blog/BlogGrid";
 import type { BlogPostData } from "../components/blog/FeaturedPost";
+import { useSEO } from "../hooks/useSEO";
+import { SEO } from "../components/seo/SEO";
+import { JsonLD } from "../components/seo/JsonLD";
+import { breadcrumbSchema } from "../lib/schemas";
 
 const POSTS_PER_PAGE = 12;
 
@@ -94,11 +98,35 @@ export const BlogPage: React.FC = () => {
     }, 300);
   }, []);
 
+  const seo = useSEO({
+    title: 'Writing — Thoughts on Engineering & Design',
+    description:
+      'Articles, tutorials, and insights on full-stack engineering, ' +
+      'IoT systems, 3D web development, and building software in Nigeria.',
+    canonical: 'https://edehchinedu.dev/blog',
+    ogType: 'website',
+    keywords: [
+      'Web Development Blog Nigeria',
+      'React Tutorials',
+      'Node.js Articles',
+      'IoT Engineering Blog',
+      'Full-Stack Developer Writing',
+      'RabbitDaCoder Blog',
+    ],
+  });
+
   return (
     <PageWrapper
       title="Blog | Edeh Chinedu Daniel"
       description="Articles about web development, design systems, and modern JavaScript."
     >
+      <SEO {...seo} />
+      <JsonLD
+        schema={breadcrumbSchema([
+          { name: 'Home', url: 'https://edehchinedu.dev' },
+          { name: 'Blog', url: 'https://edehchinedu.dev/blog' },
+        ])}
+      />
       <Section id="blog-page">
         <div className="space-y-12">
           {/* Header */}

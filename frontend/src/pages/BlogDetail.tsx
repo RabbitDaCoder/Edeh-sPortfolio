@@ -6,6 +6,10 @@ import { Section } from "../components/layout/Section";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useSEO } from "../hooks/useSEO";
+import { SEO } from "../components/seo/SEO";
+import { JsonLD } from "../components/seo/JsonLD";
+import { blogPostSchema, breadcrumbSchema } from "../lib/schemas";
 
 interface TocEntry {
   id: string;
@@ -153,8 +157,42 @@ export const BlogDetailPage: React.FC = () => {
     return () => observer.disconnect();
   }, [processedHtml]);
 
+  const seo = useSEO({
+    title: post.title,
+    description: post.excerpt,
+    canonical: `https://edehchinedu.dev/blog/${slug}`,
+    ogType: 'article',
+    ogTitle: post.title,
+    ogDescription: post.excerpt,
+    publishedTime: post.date,
+    author: 'Edeh Chinedu Daniel',
+    section: post.category,
+    tags: [post.category],
+    keywords: [post.category, 'Edeh Chinedu Daniel', 'RabbitDaCoder'],
+  });
+
   return (
     <PageWrapper title={`${post.title} | Blog`} description={post.excerpt}>
+      <SEO {...seo} />
+      <JsonLD
+        schema={blogPostSchema({
+          title: post.title,
+          slug: slug || '',
+          excerpt: post.excerpt,
+          content: post.content,
+          category: post.category,
+          tags: [post.category],
+          createdAt: post.date,
+          readTime: 8,
+        })}
+      />
+      <JsonLD
+        schema={breadcrumbSchema([
+          { name: 'Home', url: 'https://edehchinedu.dev' },
+          { name: 'Blog', url: 'https://edehchinedu.dev/blog' },
+          { name: post.title, url: `https://edehchinedu.dev/blog/${slug}` },
+        ])}
+      />
       <Section id="blog-detail">
         <div className="max-w-6xl mx-auto">
           {/* Back link */}
