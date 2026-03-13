@@ -28,12 +28,9 @@ mailQueue.on("error", (error) => {
   logger.error({ error }, "Mail queue error");
 });
 
-mailQueue.on("failed", (job, error) => {
-  logger.error({ jobId: job?.id, error }, "Mail job failed");
-});
-
 export async function addMailJob(data: MailJobData): Promise<void> {
-  await mailQueue.add(`${data.type}-mail`, data, {
+  const name: string = `${data.type}-mail`;
+  await mailQueue.add(name as keyof MailJobData, data, {
     jobId: `${data.type}-${data.email}-${Date.now()}`,
   });
 }

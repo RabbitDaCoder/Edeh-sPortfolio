@@ -74,13 +74,13 @@ export class AuthService {
 
   private generateTokens(userId: string, email: string, role: string) {
     const accessToken = jwt.sign({ id: userId, email, role }, env.JWT_SECRET, {
-      expiresIn: env.JWT_EXPIRES_IN,
+      expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
     });
 
     const refreshToken = jwt.sign(
       { id: userId, email },
       env.JWT_REFRESH_SECRET,
-      { expiresIn: env.JWT_REFRESH_EXPIRES_IN },
+      { expiresIn: env.JWT_REFRESH_EXPIRES_IN as jwt.SignOptions["expiresIn"] },
     );
 
     return { accessToken, refreshToken };

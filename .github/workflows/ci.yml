@@ -22,7 +22,7 @@ jobs:
         run: npm ci
       - name: Generate Prisma client
         if: matrix.workspace == 'backend'
-        run: npx prisma generate --schema=backend/prisma/schema.prisma
+        run: npx --prefix backend prisma generate --schema=backend/prisma/schema.prisma
       - name: Lint ${{ matrix.workspace }}
         run: npm run lint --workspace=${{ matrix.workspace }}
 
@@ -41,7 +41,7 @@ jobs:
         run: npm ci
       - name: Generate Prisma client
         if: matrix.workspace == 'backend'
-        run: npx prisma generate --schema=backend/prisma/schema.prisma
+        run: npx --prefix backend prisma generate --schema=backend/prisma/schema.prisma
       - name: Type check ${{ matrix.workspace }}
         run: npm run typecheck --workspace=${{ matrix.workspace }}
 
