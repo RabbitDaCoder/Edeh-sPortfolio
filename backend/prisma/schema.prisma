@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum TimelineType {
+  EDUCATION
+  JOB
+  FREELANCE
+  VOLUNTEER
+  ACHIEVEMENT
+  PLAN
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  role         Role     @default(ADMIN)
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Blog {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  content    String
+  excerpt    String?
+  coverImage String?
+  published  Boolean  @default(false)
+  views      Int      @default(0)
+  readTime   Int?
+  tags       String[]
+  metaTitle  String?
+  metaDesc   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Article {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  content    String
+  excerpt    String?
+  coverImage String?
+  published  Boolean  @default(false)
+  tags       String[]
+  metaTitle  String?
+  metaDesc   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Book {
+  id         String   @id @default(uuid())
+  title      String
+  slug       String   @unique
+  description String
+  coverImage String?
+  price      Decimal
+  fileUrl    String?
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model CareerTimeline {
+  id           String       @id @default(uuid())
+  type         TimelineType
+  title        String
+  organisation String?
+  description  String?
+  startDate    DateTime
+  endDate      DateTime?
+  current      Boolean      @default(false)
+  order        Int
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model Download {
+  id        String   @id @default(uuid())
+  label     String
+  fileUrl   String
+  publicId  String?
+  version   String?
+  active    Boolean  @default(true)
+  downloads Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  description     String
+  stack           String[]
+  tags            String[]
+  featured        Boolean  @default(false)
+  liveUrl         String?
+  githubUrl       String?
+  coverImage      String?
+  typographicMark String?
+  order           Int      @default(0)
+  published       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum TechCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  DEVOPS
+  THREED
+  TOOLS
+}
+
+model Skill {
+  id        String       @id @default(uuid())
+  name      String
+  category  TechCategory
+  order     Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  company   String
+  quote     String
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteProfile {
+  id           String   @id @default(uuid())
+  firstName    String
+  middleName   String?
+  lastName     String
+  tagline      String?
+  bio1         String?
+  bio2         String?
+  pullQuote    String?
+  availability String   @default("Available for work")
+  email        String
+  location     String?
+  timezone     String?
+  github       String?
+  linkedin     String?
+  youtube      String?
+  twitter      String?
+  updatedAt    DateTime @updatedAt
+}

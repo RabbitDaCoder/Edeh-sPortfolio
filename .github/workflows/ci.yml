@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: [backend, frontend, dashboard]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint ${{ matrix.workspace }}
+        run: npm run lint --workspace=${{ matrix.workspace }}
+
+  typecheck:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: [backend, frontend, dashboard]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Type check ${{ matrix.workspace }}
+        run: npm run typecheck --workspace=${{ matrix.workspace }}
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Test backend
+        run: npm run test --workspace=backend
+
+  build:
+    runs-on: ubuntu-latest
+    if: success()
+    needs: [lint, typecheck, test-backend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: false
+          tags: portfolio-backend:latest
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./frontend/Dockerfile
+          push: false
+          tags: portfolio-frontend:latest
+      - name: Build dashboard image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./dashboard/Dockerfile
+          push: false
+          tags: portfolio-dashboard:latest

@@ -1,0 +1,17 @@
+{
+  "name": "email-service",
+  "version": "1.0.0",
+  "description": "Standalone email microservice for portfolio — runs on Vercel serverless or as Node.js server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "nodemailer": "^6.9.16"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

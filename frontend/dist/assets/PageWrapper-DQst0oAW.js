@@ -1,0 +1,2 @@
+import{j as t,K as i,m as r}from"./index-Ln9xdZkh.js";const m=({title:a,description:e,children:n,className:o})=>t.jsxs(t.Fragment,{children:[t.jsxs(i,{children:[t.jsx("title",{children:a}),e&&t.jsx("meta",{name:"description",content:e}),t.jsx("meta",{property:"og:title",content:a}),e&&t.jsx("meta",{property:"og:description",content:e})]}),t.jsx(r.div,{initial:{opacity:0,y:20},animate:{opacity:1,y:0},exit:{opacity:0,y:20},transition:{duration:.4},className:o,children:n})]});export{m as P};
+//# sourceMappingURL=PageWrapper-DQst0oAW.js.map
