@@ -16,9 +16,7 @@ services:
       - key: PORT
         value: "4000"
       - key: DATABASE_URL
-        fromDatabase:
-          name: portfolio-db
-          property: connectionString
+        sync: false # Set in Render dashboard — use EXTERNAL URL from other account
       - key: REDIS_URL
         sync: false # Manually set — Upstash Redis
       - key: JWT_SECRET
@@ -52,11 +50,3 @@ services:
         - package.json
         - package-lock.json
     preDeployCommand: "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/seed/seed.js"
-
-databases:
-  - name: portfolio-db
-    plan: starter
-    databaseName: portfolio
-    postgresMajorVersion: "16"
-    region: oregon
-    ipAllowList: [] # Internal Render connections only

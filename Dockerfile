@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # System deps for native modules (bcrypt, prisma)
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ openssl openssl-dev
 
 # 1. Copy manifests first (maximizes Docker layer cache)
 COPY package.json package-lock.json ./
@@ -66,5 +66,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Default CMD: run migrations, seed data, then start API server
-CMD ["sh", "-c", "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/seed/seed.js && node backend/dist/server.js"]
+# Default CMD: start API server (migrations + seed run via Render preDeployCommand)
+CMD ["node", "backend/dist/server.js"]
