@@ -25,7 +25,7 @@ COPY backend/tsconfig.json backend/
 RUN npm run build --workspace=backend
 
 # 5. Compile seed script separately (prisma/ is outside src/)
-RUN npx --prefix backend tsc --esModuleInterop --module commonjs --target ES2020 --moduleResolution node --skipLibCheck --outDir backend/dist/seed backend/prisma/seed.ts
+RUN npx --prefix backend tsc --esModuleInterop --module commonjs --target ES2020 --moduleResolution node --skipLibCheck --types node --typeRoots backend/node_modules/@types --outDir backend/dist/seed backend/prisma/seed.ts
 
 # 6. Prune dev dependencies for production image
 RUN npm prune --production --workspace=backend
