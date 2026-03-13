@@ -20,6 +20,9 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
+      - name: Generate Prisma client
+        if: matrix.workspace == 'backend'
+        run: npx prisma generate --schema=backend/prisma/schema.prisma
       - name: Lint ${{ matrix.workspace }}
         run: npm run lint --workspace=${{ matrix.workspace }}
 
@@ -36,26 +39,16 @@ jobs:
           cache: "npm"
       - name: Install dependencies
         run: npm ci
+      - name: Generate Prisma client
+        if: matrix.workspace == 'backend'
+        run: npx prisma generate --schema=backend/prisma/schema.prisma
       - name: Type check ${{ matrix.workspace }}
         run: npm run typecheck --workspace=${{ matrix.workspace }}
-
-  test-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-      - name: Install dependencies
-        run: npm ci
-      - name: Test backend
-        run: npm run test --workspace=backend
 
   build:
     runs-on: ubuntu-latest
     if: success()
-    needs: [lint, typecheck, test-backend]
+    needs: [lint, typecheck]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx

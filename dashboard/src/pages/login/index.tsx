@@ -38,7 +38,8 @@ export function LoginPage() {
       navigate("/", { replace: true });
     } catch (err: any) {
       setError(
-        err.response?.data?.message || "Invalid credentials. Please try again.",
+        err.response?.data?.error?.message ||
+          "Invalid credentials. Please try again.",
       );
     } finally {
       setLoading(false);

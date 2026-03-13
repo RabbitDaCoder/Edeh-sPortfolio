@@ -22,9 +22,13 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      window.location.href = "/login";
+      const url = error.config?.url || "";
+      // Don't redirect on login — let the login page handle 401
+      if (!url.includes("auth/login")) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   },

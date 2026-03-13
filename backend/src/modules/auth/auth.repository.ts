@@ -5,7 +5,7 @@ import { env } from "../../config/env";
 export class AuthRepository {
   async findUserByEmail(email: string) {
     return db.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
     });
   }
 
@@ -16,7 +16,7 @@ export class AuthRepository {
     );
     return db.user.create({
       data: {
-        email,
+        email: email.toLowerCase(),
         password: hashedPassword,
       },
     });

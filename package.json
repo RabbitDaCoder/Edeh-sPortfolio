@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "Production-grade portfolio platform for Edeh Chinedu Daniel",
   "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "dashboard",
+    "email-service"
+  ],
   "scripts": {
     "dev:frontend": "cd frontend && npm run dev",
     "dev:dashboard": "cd dashboard && npm run dev",
