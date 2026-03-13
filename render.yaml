@@ -1,14 +1,15 @@
 services:
-  # ── Backend API ──────────────────────────────────────────────
+  # ─── Web Service (API) ──────────────────────────────────────────
   - type: web
     name: portfolio-backend
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: .
     region: oregon
     plan: starter
     branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
+    numInstances: 1
     envVars:
       - key: NODE_ENV
         value: production
@@ -19,10 +20,7 @@ services:
           name: portfolio-db
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          name: portfolio-redis
-          type: redis
-          property: connectionString
+        sync: false # Manually set — Upstash Redis
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET
@@ -34,7 +32,7 @@ services:
       - key: BCRYPT_SALT_ROUNDS
         value: "12"
       - key: CORS_ORIGIN
-        sync: false
+        sync: false # Set in Render dashboard
       - key: ADMIN_EMAIL
         sync: false
       - key: EMAIL_SERVICE_URL
@@ -47,6 +45,13 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+    buildFilter:
+      paths:
+        - backend/**
+        - Dockerfile
+        - package.json
+        - package-lock.json
+    preDeployCommand: "npx prisma migrate deploy --schema=backend/prisma/schema.prisma"
 
 databases:
   - name: portfolio-db
@@ -54,3 +59,4 @@ databases:
     databaseName: portfolio
     postgresMajorVersion: "16"
     region: oregon
+    ipAllowList: [] # Internal Render connections only
