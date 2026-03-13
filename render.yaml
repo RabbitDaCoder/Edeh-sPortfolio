@@ -51,7 +51,7 @@ services:
         - Dockerfile
         - package.json
         - package-lock.json
-    preDeployCommand: "npx prisma migrate deploy --schema=backend/prisma/schema.prisma"
+    preDeployCommand: "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/seed/seed.js"
 
 databases:
   - name: portfolio-db

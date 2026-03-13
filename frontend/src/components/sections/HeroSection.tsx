@@ -6,24 +6,6 @@ import { Badge } from "../ui/Badge";
 import { PERSONAL } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
-/** Pure CSS orbital rings — visual anchor for 3D sphere area */
-const OrbitalRings: React.FC = () => (
-  <div className="relative w-full aspect-square max-w-md mx-auto">
-    {/* Outer ring */}
-    <div className="absolute inset-0 rounded-full border border-border/30 animate-[spin_30s_linear_infinite]" />
-    {/* Mid ring */}
-    <div className="absolute inset-[12%] rounded-full border border-border/20 animate-[spin_22s_linear_infinite_reverse]" />
-    {/* Inner ring */}
-    <div className="absolute inset-[24%] rounded-full border border-border/15 animate-[spin_16s_linear_infinite]" />
-    {/* Center dot */}
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-text-muted/30" />
-    {/* Orbital nodes */}
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-text-muted/50" />
-    <div className="absolute bottom-[12%] right-[5%] w-1 h-1 rounded-full bg-text-muted/40" />
-    <div className="absolute top-[30%] left-[5%] w-1 h-1 rounded-full bg-text-muted/30" />
-  </div>
-);
-
 export const HeroSection: React.FC = () => {
   const { data: personal = PERSONAL } = useProfile();
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -48,8 +30,8 @@ export const HeroSection: React.FC = () => {
 
   return (
     <Section id="hero" className="min-h-screen flex items-center">
-      <div className="w-full grid grid-cols-1 lg:grid-cols-[55%_45%] gap-12 items-center">
-        {/* Left column — text */}
+      <div className="w-full max-w-3xl">
+        {/* Text content */}
         <div className="space-y-8">
           <Badge variant="pulse" className="text-xs">
             {personal.availability}
@@ -106,16 +88,6 @@ export const HeroSection: React.FC = () => {
             </Button>
           </motion.div>
         </div>
-
-        {/* Right column — orbital rings (3D sphere renders through GlobalCanvas) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="hidden lg:block"
-        >
-          <OrbitalRings />
-        </motion.div>
       </div>
 
       {/* Scroll indicator */}

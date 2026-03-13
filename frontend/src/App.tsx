@@ -73,8 +73,10 @@ export function App() {
         >
           <ScrollToTop />
           <div className="text-text-primary min-h-screen">
-            {/* Global 3D Canvas */}
-            <GlobalCanvas />
+            {/* Global 3D Canvas — wrapped in boundary so GPU failures don't blank the page */}
+            <ErrorBoundary fallback={null}>
+              <GlobalCanvas />
+            </ErrorBoundary>
 
             {/* Scroll Progress Bar */}
             <ScrollProgress />

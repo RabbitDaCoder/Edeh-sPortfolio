@@ -13,24 +13,26 @@ export interface MailJobData {
 
 const connection = new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
 
-export const mailQueue = new Queue<MailJobData>("mail", {
-  connection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: "exponential",
-      delay: 2000,
+export const mailQueue = new Queue<MailJobData, void, MailJobData["type"]>(
+  "mail",
+  {
+    connection,
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 2000,
+      },
     },
   },
-});
+);
 
 mailQueue.on("error", (error) => {
   logger.error({ error }, "Mail queue error");
 });
 
 export async function addMailJob(data: MailJobData): Promise<void> {
-  const name: string = `${data.type}-mail`;
-  await mailQueue.add(name as keyof MailJobData, data, {
+  await mailQueue.add(data.type, data, {
     jobId: `${data.type}-${data.email}-${Date.now()}`,
   });
 }

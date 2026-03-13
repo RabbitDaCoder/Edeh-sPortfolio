@@ -24,7 +24,10 @@ COPY backend/src backend/src
 COPY backend/tsconfig.json backend/
 RUN npm run build --workspace=backend
 
-# 5. Prune dev dependencies for production image
+# 5. Compile seed script separately (prisma/ is outside src/)
+RUN npx --prefix backend tsc --esModuleInterop --module commonjs --target ES2020 --moduleResolution node --skipLibCheck --outDir backend/dist/seed backend/prisma/seed.ts
+
+# 6. Prune dev dependencies for production image
 RUN npm prune --production --workspace=backend
 
 # ─── Stage 2: Production ─────────────────────────────────────────────
@@ -39,6 +42,11 @@ COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/package.json ./backend/
 COPY --from=builder /app/backend/prisma ./backend/prisma
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
+
+# Copy frontend/dashboard/email-service stubs so workspace resolution works
+COPY --from=builder /app/frontend/package.json ./frontend/
+COPY --from=builder /app/dashboard/package.json ./dashboard/
+COPY --from=builder /app/email-service/package.json ./email-service/
 
 # Non-root user for security
 RUN addgroup -g 1001 -S portfolio && \
@@ -58,5 +66,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Default CMD: run migrations, seed admin, then start API server
-CMD ["sh", "-c", "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/server.js"]
+# Default CMD: run migrations, seed data, then start API server
+CMD ["sh", "-c", "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/seed/seed.js && node backend/dist/server.js"]

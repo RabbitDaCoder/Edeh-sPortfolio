@@ -4,7 +4,6 @@ import { useSceneStore } from "../../store/sceneStore";
 import { StarField } from "./shared/StarField";
 import { NebulaCloud } from "./shared/NebulaCloud";
 import { Effects } from "./postprocessing/Effects";
-import { HeroScene } from "./scenes/HeroScene";
 import { AboutScene } from "./scenes/AboutScene";
 import { SkillsScene } from "./scenes/SkillsScene";
 import { WorkScene } from "./scenes/WorkScene";
@@ -46,12 +45,27 @@ function LoadNotifier() {
 export function GlobalCanvas() {
   const [visible, setVisible] = useState(true);
 
-  // Hide canvas on low-end devices that can't keep up
   useEffect(() => {
+    // Disable 3D on mobile devices — prevents blank-page crashes
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      setVisible(false);
+      return;
+    }
+    // Disable on low-end desktops
     if (
       typeof navigator !== "undefined" &&
       navigator.hardwareConcurrency <= 2
     ) {
+      setVisible(false);
+      return;
+    }
+    // Detect WebGL support
+    try {
+      const c = document.createElement("canvas");
+      const gl = c.getContext("webgl2") || c.getContext("webgl");
+      if (!gl) setVisible(false);
+    } catch {
       setVisible(false);
     }
   }, []);
@@ -108,7 +122,6 @@ export function GlobalCanvas() {
           <NebulaCloud />
 
           {/* Section scenes — visibility controlled internally */}
-          <HeroScene />
           <AboutScene />
           <SkillsScene />
           <WorkScene />
