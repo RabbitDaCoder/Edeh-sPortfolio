@@ -12,6 +12,8 @@ import { Navigation } from "./components/layout/Navigation";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgress } from "./components/ui/ScrollProgress";
 import { GlobalCanvas } from "./components/3d/GlobalCanvas";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
+import { SectionError } from "./components/ui/SectionError";
 import "./index.css";
 
 function ScrollToTop() {
@@ -90,13 +92,27 @@ export function App() {
                     <div className="divide-y divide-border/10">
                       <HeroSection />
                       <AboutSection />
-                      <SkillsSection />
-                      <WorkSection />
-                      <CareerSection />
-                      <AchievementsSection />
-                      <TestimonialsSection />
-                      <BlogPreviewSection />
-                      <BooksPreviewSection />
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <SkillsSection />
+                      </ErrorBoundary>
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <WorkSection />
+                      </ErrorBoundary>
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <CareerSection />
+                      </ErrorBoundary>
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <AchievementsSection />
+                      </ErrorBoundary>
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <TestimonialsSection />
+                      </ErrorBoundary>
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <BlogPreviewSection />
+                      </ErrorBoundary>
+                      <ErrorBoundary fallback={<SectionError />}>
+                        <BooksPreviewSection />
+                      </ErrorBoundary>
                       <BookCallSection />
                       <CvDownloadSection />
                     </div>
@@ -108,7 +124,9 @@ export function App() {
                   path="/blog"
                   element={
                     <React.Suspense fallback={<PageFallback />}>
-                      <BlogPage />
+                      <ErrorBoundary>
+                        <BlogPage />
+                      </ErrorBoundary>
                     </React.Suspense>
                   }
                 />
@@ -116,7 +134,9 @@ export function App() {
                   path="/blog/:slug"
                   element={
                     <React.Suspense fallback={<PageFallback />}>
-                      <BlogDetailPage />
+                      <ErrorBoundary>
+                        <BlogDetailPage />
+                      </ErrorBoundary>
                     </React.Suspense>
                   }
                 />
@@ -126,7 +146,9 @@ export function App() {
                   path="/books"
                   element={
                     <React.Suspense fallback={<PageFallback />}>
-                      <BooksPage />
+                      <ErrorBoundary>
+                        <BooksPage />
+                      </ErrorBoundary>
                     </React.Suspense>
                   }
                 />
@@ -134,7 +156,9 @@ export function App() {
                   path="/books/:slug"
                   element={
                     <React.Suspense fallback={<PageFallback />}>
-                      <BooksDetailPage />
+                      <ErrorBoundary>
+                        <BooksDetailPage />
+                      </ErrorBoundary>
                     </React.Suspense>
                   }
                 />
@@ -144,7 +168,9 @@ export function App() {
                   path="/contact"
                   element={
                     <React.Suspense fallback={<PageFallback />}>
-                      <ContactPage />
+                      <ErrorBoundary>
+                        <ContactPage />
+                      </ErrorBoundary>
                     </React.Suspense>
                   }
                 />
@@ -154,7 +180,9 @@ export function App() {
                   path="/projects"
                   element={
                     <React.Suspense fallback={<PageFallback />}>
-                      <ProjectsPage />
+                      <ErrorBoundary>
+                        <ProjectsPage />
+                      </ErrorBoundary>
                     </React.Suspense>
                   }
                 />

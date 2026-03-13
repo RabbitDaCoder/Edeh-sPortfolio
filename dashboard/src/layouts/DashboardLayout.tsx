@@ -21,6 +21,7 @@ import {
   User,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ErrorBoundary } from "../components/ui/ErrorBoundary";
 
 interface NavGroup {
   label: string;
@@ -238,7 +239,9 @@ export function DashboardLayout() {
           }}
           key={location.pathname}
         >
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

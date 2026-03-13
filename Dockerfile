@@ -17,7 +17,7 @@ RUN npm ci --workspace=backend
 
 # 3. Copy Prisma schema and generate client
 COPY backend/prisma backend/prisma
-RUN npx prisma generate --schema=backend/prisma/schema.prisma
+RUN npx --prefix backend prisma generate --schema=backend/prisma/schema.prisma
 
 # 4. Copy source and build
 COPY backend/src backend/src
@@ -59,4 +59,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 ENTRYPOINT ["/sbin/tini", "--"]
 
 # Default CMD: run migrations, seed admin, then start API server
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/server.js"]
+CMD ["sh", "-c", "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/server.js"]
