@@ -1,11 +1,8 @@
 import { Worker, Job } from "bullmq";
-import Redis from "ioredis";
 import { env } from "../config/env";
 import { mailService } from "../services/mail.service";
 import { logger } from "../utils/logger";
 import { MailJobData } from "./queue";
-
-const connection = new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
 
 export const mailWorker = new Worker<MailJobData>(
   "mail",
@@ -31,7 +28,7 @@ export const mailWorker = new Worker<MailJobData>(
     }
   },
   {
-    connection,
+    connection: { url: env.REDIS_URL },
     concurrency: 5,
   },
 );
