@@ -132,10 +132,62 @@ export function breadcrumbSchema(items: { name: string; url: string }[]) {
   };
 }
 
+export function projectSchema(project: {
+  name: string;
+  slug: string;
+  description: string;
+  stack: string[];
+  coverImage?: string | null;
+  liveUrl?: string | null;
+  githubUrl?: string | null;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    name: project.name,
+    description: project.description,
+    url: project.liveUrl ?? `${SEO_DEFAULTS.siteUrl}/projects`,
+    ...(project.githubUrl && { codeRepository: project.githubUrl }),
+    image: project.coverImage ?? SEO_DEFAULTS.defaultOgImage,
+    programmingLanguage: project.stack.join(", "),
+    author: {
+      "@type": "Person",
+      name: "Edeh Chinedu Daniel",
+      url: SEO_DEFAULTS.siteUrl,
+    },
+  };
+}
+
+export function collectionPageSchema(page: {
+  name: string;
+  description: string;
+  url: string;
+  items: { name: string; url: string }[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: page.name,
+    description: page.description,
+    url: page.url,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: page.items.length,
+      itemListElement: page.items.map((item, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: item.name,
+        url: item.url,
+      })),
+    },
+  };
+}
+
 export function contactPageSchema() {
   const {
     "@type": _type,
     "@context": _ctx,
+    "@id": _id,
     ...personFields
   } = PERSON_SCHEMA_BASE;
   return {

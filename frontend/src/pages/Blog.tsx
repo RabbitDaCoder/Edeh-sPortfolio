@@ -9,7 +9,8 @@ import type { BlogPostData } from "../components/blog/FeaturedPost";
 import { useSEO } from "../hooks/useSEO";
 import { SEO } from "../components/seo/SEO";
 import { JsonLD } from "../components/seo/JsonLD";
-import { breadcrumbSchema } from "../lib/schemas";
+import { breadcrumbSchema, collectionPageSchema } from "../lib/schemas";
+import { SEO_DEFAULTS } from "../lib/seo";
 
 const POSTS_PER_PAGE = 12;
 
@@ -126,6 +127,17 @@ export const BlogPage: React.FC = () => {
           { name: 'Home', url: 'https://edehchinedu.dev' },
           { name: 'Blog', url: 'https://edehchinedu.dev/blog' },
         ])}
+      />
+      <JsonLD
+        schema={collectionPageSchema({
+          name: 'Blog — Edeh Chinedu Daniel',
+          description: 'Articles, tutorials, and insights on full-stack engineering, IoT, and 3D web development.',
+          url: `${SEO_DEFAULTS.siteUrl}/blog`,
+          items: filteredPosts.slice(0, 20).map((p) => ({
+            name: p.title,
+            url: `${SEO_DEFAULTS.siteUrl}/blog/${p.slug}`,
+          })),
+        })}
       />
       <Section id="blog-page">
         <div className="space-y-12">

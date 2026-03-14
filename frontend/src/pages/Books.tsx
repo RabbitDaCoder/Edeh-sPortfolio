@@ -8,7 +8,8 @@ import { Button } from '../components/ui/Button';
 import { useSEO } from '../hooks/useSEO';
 import { SEO } from '../components/seo/SEO';
 import { JsonLD } from '../components/seo/JsonLD';
-import { breadcrumbSchema } from '../lib/schemas';
+import { breadcrumbSchema, collectionPageSchema } from '../lib/schemas';
+import { SEO_DEFAULTS } from '../lib/seo';
 
 export const BooksPage: React.FC = () => {
   const books = Array.from({ length: 12 }, (_, i) => ({
@@ -46,6 +47,17 @@ export const BooksPage: React.FC = () => {
           { name: 'Home', url: 'https://edehchinedu.dev' },
           { name: 'Books', url: 'https://edehchinedu.dev/books' },
         ])}
+      />
+      <JsonLD
+        schema={collectionPageSchema({
+          name: 'Books — Edeh Chinedu Daniel',
+          description: 'Books recommended and written by Edeh Chinedu Daniel on software engineering and creative technology.',
+          url: `${SEO_DEFAULTS.siteUrl}/books`,
+          items: books.map((b) => ({
+            name: b.title,
+            url: `${SEO_DEFAULTS.siteUrl}/books/${b.id}`,
+          })),
+        })}
       />
       <Section id="books-page">
         <div className="space-y-12">
