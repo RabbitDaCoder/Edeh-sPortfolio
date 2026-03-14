@@ -50,7 +50,7 @@ COPY --from=builder /app/email-service/package.json ./email-service/
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh && sed -i 's/\r$//' docker-entrypoint.sh
 
 # Non-root user for security
 RUN addgroup -g 1001 -S portfolio && \
