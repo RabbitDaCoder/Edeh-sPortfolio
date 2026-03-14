@@ -100,19 +100,19 @@ export const BlogPage: React.FC = () => {
   }, []);
 
   const seo = useSEO({
-    title: 'Writing — Thoughts on Engineering & Design',
+    title: "Writing — Thoughts on Engineering & Design",
     description:
-      'Articles, tutorials, and insights on full-stack engineering, ' +
-      'IoT systems, 3D web development, and building software in Nigeria.',
-    canonical: 'https://edehchinedu.dev/blog',
-    ogType: 'website',
+      "Articles, tutorials, and insights on full-stack engineering, " +
+      "IoT systems, 3D web development, and building software in Nigeria.",
+    canonical: "https://edehchinedu.dev/blog",
+    ogType: "website",
     keywords: [
-      'Web Development Blog Nigeria',
-      'React Tutorials',
-      'Node.js Articles',
-      'IoT Engineering Blog',
-      'Full-Stack Developer Writing',
-      'RabbitDaCoder Blog',
+      "Web Development Blog Nigeria",
+      "React Tutorials",
+      "Node.js Articles",
+      "IoT Engineering Blog",
+      "Full-Stack Developer Writing",
+      "RabbitDaCoder Blog",
     ],
   });
 
@@ -124,14 +124,15 @@ export const BlogPage: React.FC = () => {
       <SEO {...seo} />
       <JsonLD
         schema={breadcrumbSchema([
-          { name: 'Home', url: 'https://edehchinedu.dev' },
-          { name: 'Blog', url: 'https://edehchinedu.dev/blog' },
+          { name: "Home", url: "https://edehchinedu.dev" },
+          { name: "Blog", url: "https://edehchinedu.dev/blog" },
         ])}
       />
       <JsonLD
         schema={collectionPageSchema({
-          name: 'Blog — Edeh Chinedu Daniel',
-          description: 'Articles, tutorials, and insights on full-stack engineering, IoT, and 3D web development.',
+          name: "Blog — Edeh Chinedu Daniel",
+          description:
+            "Articles, tutorials, and insights on full-stack engineering, IoT, and 3D web development.",
           url: `${SEO_DEFAULTS.siteUrl}/blog`,
           items: filteredPosts.slice(0, 20).map((p) => ({
             name: p.title,

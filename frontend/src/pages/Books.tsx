@@ -1,38 +1,38 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { PageWrapper } from '../components/layout/PageWrapper';
-import { Section } from '../components/layout/Section';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
-import { Button } from '../components/ui/Button';
-import { useSEO } from '../hooks/useSEO';
-import { SEO } from '../components/seo/SEO';
-import { JsonLD } from '../components/seo/JsonLD';
-import { breadcrumbSchema, collectionPageSchema } from '../lib/schemas';
-import { SEO_DEFAULTS } from '../lib/seo';
+import React from "react";
+import { Helmet } from "react-helmet-async";
+import { PageWrapper } from "../components/layout/PageWrapper";
+import { Section } from "../components/layout/Section";
+import { Card } from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
+import { Button } from "../components/ui/Button";
+import { useSEO } from "../hooks/useSEO";
+import { SEO } from "../components/seo/SEO";
+import { JsonLD } from "../components/seo/JsonLD";
+import { breadcrumbSchema, collectionPageSchema } from "../lib/schemas";
+import { SEO_DEFAULTS } from "../lib/seo";
 
 export const BooksPage: React.FC = () => {
   const books = Array.from({ length: 12 }, (_, i) => ({
     id: String(i + 1),
     title: `Book Title ${i + 1}`,
-    author: 'Edeh Chinedu Daniel',
+    author: "Edeh Chinedu Daniel",
     year: 2020 + (i % 4),
-    description: 'A great book about web development and design systems.',
-    price: '$29.99',
+    description: "A great book about web development and design systems.",
+    price: "$29.99",
   }));
 
   const seo = useSEO({
-    title: 'Books — Recommended Reading',
+    title: "Books — Recommended Reading",
     description:
-      'Books recommended and written by Edeh Chinedu Daniel on ' +
-      'software engineering, product building, and creative technology.',
-    canonical: 'https://edehchinedu.dev/books',
-    ogType: 'website',
+      "Books recommended and written by Edeh Chinedu Daniel on " +
+      "software engineering, product building, and creative technology.",
+    canonical: "https://edehchinedu.dev/books",
+    ogType: "website",
     keywords: [
-      'Engineering Books',
-      'Software Development Books',
-      'RabbitDaCoder Reading List',
-      'Tech Books Nigeria',
+      "Engineering Books",
+      "Software Development Books",
+      "RabbitDaCoder Reading List",
+      "Tech Books Nigeria",
     ],
   });
 
@@ -44,14 +44,15 @@ export const BooksPage: React.FC = () => {
       <SEO {...seo} />
       <JsonLD
         schema={breadcrumbSchema([
-          { name: 'Home', url: 'https://edehchinedu.dev' },
-          { name: 'Books', url: 'https://edehchinedu.dev/books' },
+          { name: "Home", url: "https://edehchinedu.dev" },
+          { name: "Books", url: "https://edehchinedu.dev/books" },
         ])}
       />
       <JsonLD
         schema={collectionPageSchema({
-          name: 'Books — Edeh Chinedu Daniel',
-          description: 'Books recommended and written by Edeh Chinedu Daniel on software engineering and creative technology.',
+          name: "Books — Edeh Chinedu Daniel",
+          description:
+            "Books recommended and written by Edeh Chinedu Daniel on software engineering and creative technology.",
           url: `${SEO_DEFAULTS.siteUrl}/books`,
           items: books.map((b) => ({
             name: b.title,
