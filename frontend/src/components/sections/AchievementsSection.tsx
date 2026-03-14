@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { useAchievements } from "../../features/achievements/hooks/useAchievements";
+import { ACHIEVEMENTS as FALLBACK_ACHIEVEMENTS } from "../../data/portfolio";
 import type { Achievement } from "../../data/portfolio";
 import { Award, Trophy, Zap, BookOpen } from "lucide-react";
 
@@ -31,7 +32,7 @@ function AchievementMilestone({
   return (
     <div
       ref={ref}
-      className={`relative flex items-start gap-0 md:gap-0 ${
+      className={`relative flex items-start md:gap-0 ${
         isEven ? "md:flex-row" : "md:flex-row-reverse"
       }`}
     >
@@ -124,12 +125,14 @@ export const AchievementsSection: React.FC = () => {
   const trackRef = useRef<HTMLDivElement>(null);
   const { data: raw } = useAchievements();
 
-  const achievements: Achievement[] = (raw ?? []).map((a: any) => ({
-    id: a.id,
-    title: a.title,
-    description: a.description ?? "",
-    date: formatDate(a.date ?? a.createdAt),
-  }));
+  const achievements: Achievement[] = (raw ?? []).length
+    ? (raw ?? []).map((a: any) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description ?? "",
+        date: formatDate(a.date ?? a.createdAt),
+      }))
+    : FALLBACK_ACHIEVEMENTS;
 
   // Scroll-driven progress line
   useEffect(() => {
@@ -155,7 +158,7 @@ export const AchievementsSection: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
-  if (!raw || raw.length === 0) return null;
+  if (achievements.length === 0) return null;
 
   return (
     <Section id="achievements" className="bg-surface/30">

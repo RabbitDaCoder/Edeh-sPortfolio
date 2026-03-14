@@ -6,6 +6,7 @@ import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useCareerTimeline } from "../../features/career/hooks/useCareer";
+import { EXPERIENCES } from "../../data/portfolio";
 import type { Experience } from "../../data/portfolio";
 import { Briefcase, GraduationCap, Rocket, ChevronRight } from "lucide-react";
 
@@ -42,7 +43,7 @@ function TimelineCard({ entry, index }: { entry: Experience; index: number }) {
   return (
     <div
       ref={ref}
-      className={`relative flex items-start gap-6 md:gap-0 ${
+      className={`relative flex items-start md:gap-0 ${
         isEven ? "md:flex-row" : "md:flex-row-reverse"
       }`}
     >
@@ -147,14 +148,16 @@ export const CareerSection: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const { data: raw } = useCareerTimeline();
 
-  const experiences: Experience[] = (raw ?? []).map((e: any) => ({
-    id: e.id,
-    role: e.title,
-    organisation: e.organisation ?? "",
-    description: e.description ?? "",
-    period: formatPeriod(e.startDate, e.endDate, e.current),
-    type: TYPE_MAP[e.type] ?? "work",
-  }));
+  const experiences: Experience[] = (raw ?? []).length
+    ? (raw ?? []).map((e: any) => ({
+        id: e.id,
+        role: e.title,
+        organisation: e.organisation ?? "",
+        description: e.description ?? "",
+        period: formatPeriod(e.startDate, e.endDate, e.current),
+        type: TYPE_MAP[e.type] ?? "work",
+      }))
+    : EXPERIENCES;
 
   const filtered = experiences.filter(
     (entry) => filter === "all" || entry.type === filter,
@@ -184,7 +187,7 @@ export const CareerSection: React.FC = () => {
     return () => ctx.revert();
   }, [filtered]);
 
-  if (!raw || raw.length === 0) return null;
+  if (experiences.length === 0) return null;
 
   return (
     <Section id="career">
