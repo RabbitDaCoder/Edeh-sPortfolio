@@ -2,7 +2,7 @@
 set -e
 
 echo "==> Running Prisma migrations..."
-npx prisma migrate deploy --schema=backend/prisma/schema.prisma
+./backend/node_modules/.bin/prisma migrate deploy --schema=backend/prisma/schema.prisma
 
 echo "==> Running seed script..."
 node backend/dist/seed/seed.js || echo "Seed script failed (may already be seeded), continuing..."
