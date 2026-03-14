@@ -48,6 +48,10 @@ COPY --from=builder /app/frontend/package.json ./frontend/
 COPY --from=builder /app/dashboard/package.json ./dashboard/
 COPY --from=builder /app/email-service/package.json ./email-service/
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
 # Non-root user for security
 RUN addgroup -g 1001 -S portfolio && \
     adduser -S portfolio -u 1001 -G portfolio && \
@@ -66,5 +70,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Default CMD: start API server (migrations + seed run via Render preDeployCommand)
-CMD ["node", "backend/dist/server.js"]
+# Run migrations + seed + start server
+CMD ["./docker-entrypoint.sh"]

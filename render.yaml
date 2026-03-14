@@ -47,6 +47,6 @@ services:
       paths:
         - backend/**
         - Dockerfile
+        - docker-entrypoint.sh
         - package.json
         - package-lock.json
-    preDeployCommand: "npx --prefix backend prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/seed/seed.js"
