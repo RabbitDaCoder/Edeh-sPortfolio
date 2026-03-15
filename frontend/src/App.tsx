@@ -86,7 +86,7 @@ export function App() {
             <Navigation />
 
             {/* Main Content */}
-            <main className="relative z-10 pt-16">
+            <main className="relative z-10 pt-16 overflow-x-hidden">
               <Routes>
                 {/* Home - Single Page with all sections */}
                 <Route

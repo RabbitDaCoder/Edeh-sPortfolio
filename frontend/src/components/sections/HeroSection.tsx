@@ -66,7 +66,7 @@ export const HeroSection: React.FC = () => {
 
       {/* Polaroid strip — sits below the hero text + 3D area */}
       <div
-        className="w-full max-w-[100vw] mt-12 md:mt-16 overflow-hidden"
+        className="w-full mt-12 md:mt-16 overflow-hidden"
         style={{ position: "relative", zIndex: 1 }}
       >
         <PolaroidCarousel />

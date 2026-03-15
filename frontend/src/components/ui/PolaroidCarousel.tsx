@@ -27,7 +27,6 @@ export function PolaroidCarousel() {
     <div
       style={{
         width: "100%",
-        maxWidth: "100vw",
         paddingBottom: "2rem",
         paddingTop: "1rem",
         overflow: "hidden",
