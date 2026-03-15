@@ -1,71 +1,58 @@
-import { useRef } from "react";
 import { PolaroidCard } from "./PolaroidCard";
 import { usePolaroids } from "../../features/polaroids/hooks/usePolaroids";
 
+/**
+ * Infinite auto-scrolling polaroid marquee.
+ *
+ * How it works:
+ * - The polaroid array is rendered TWICE side-by-side.
+ * - A CSS animation translates the track by -50% (one full set).
+ * - When it reaches the end of the first set, it's visually identical
+ *   to the start → seamless infinite loop.
+ * - Pauses on hover so users can inspect a card.
+ * - Speed adapts: 20s base + 4s per card for a relaxed pace.
+ */
 export function PolaroidCarousel() {
   const { data: polaroids = [] } = usePolaroids();
-  const trackRef = useRef<HTMLDivElement>(null);
 
-  let isDown = false;
-  let startX = 0;
-  let scrollLeft = 0;
+  if (polaroids.length === 0) return null;
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    isDown = true;
-    startX = e.pageX - (trackRef.current?.offsetLeft ?? 0);
-    scrollLeft = trackRef.current?.scrollLeft ?? 0;
-    if (trackRef.current) {
-      trackRef.current.style.cursor = "grabbing";
-    }
-  };
+  // Duplicate for seamless loop
+  const doubled = [...polaroids, ...polaroids];
 
-  const onMouseLeave = () => {
-    isDown = false;
-    if (trackRef.current) {
-      trackRef.current.style.cursor = "grab";
-    }
-  };
-
-  const onMouseUp = () => {
-    isDown = false;
-    if (trackRef.current) {
-      trackRef.current.style.cursor = "grab";
-    }
-  };
-
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - (trackRef.current?.offsetLeft ?? 0);
-    const walk = (x - startX) * 1.5;
-    if (trackRef.current) {
-      trackRef.current.scrollLeft = scrollLeft - walk;
-    }
-  };
+  // Speed: more cards → longer duration so each card is visible long enough
+  const duration = 20 + polaroids.length * 4;
 
   return (
-    <div className="w-full overflow-hidden pb-6 pt-4">
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "100vw",
+        paddingBottom: "2rem",
+        paddingTop: "1rem",
+        overflow: "hidden",
+      }}
+    >
       <div
-        ref={trackRef}
-        onMouseDown={onMouseDown}
-        onMouseLeave={onMouseLeave}
-        onMouseUp={onMouseUp}
-        onMouseMove={onMouseMove}
-        className="polaroid-track flex flex-row items-end gap-4 sm:gap-5 overflow-x-auto px-4 sm:px-6 sm:justify-center"
         style={{
-          scrollbarWidth: "none",
-          cursor: "grab",
-          scrollSnapType: "x mandatory",
-          WebkitOverflowScrolling: "touch",
+          display: "flex",
+          alignItems: "flex-end",
+          gap: "clamp(12px, 3vw, 24px)",
+          width: "max-content",
+          animation: `polaroid-scroll ${duration}s linear infinite`,
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLDivElement).style.animationPlayState =
+            "paused";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).style.animationPlayState =
+            "running";
         }}
       >
-        {polaroids.map((polaroid, i) => (
-          <div
-            key={polaroid.id}
-            className="snap-center"
-            style={{ flexShrink: 0 }}
-          >
-            <PolaroidCard polaroid={polaroid} index={i} />
+        {doubled.map((polaroid, i) => (
+          <div key={`${polaroid.id}-${i}`} style={{ flexShrink: 0 }}>
+            <PolaroidCard polaroid={polaroid} index={i % polaroids.length} />
           </div>
         ))}
       </div>

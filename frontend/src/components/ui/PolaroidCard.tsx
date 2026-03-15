@@ -9,11 +9,11 @@ type Props = {
 export function PolaroidCard({ polaroid, index }: Props) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24, rotate: polaroid.rotation }}
+      initial={{ opacity: 0, y: 20, rotate: polaroid.rotation }}
       animate={{ opacity: 1, y: 0, rotate: polaroid.rotation }}
       transition={{
-        duration: 0.55,
-        delay: 0.15 + index * 0.08,
+        duration: 0.5,
+        delay: 0.1 + index * 0.05,
         ease: [0.25, 0.1, 0.25, 1],
       }}
       whileHover={{
@@ -31,10 +31,14 @@ export function PolaroidCard({ polaroid, index }: Props) {
     >
       {/* Polaroid frame */}
       <div
-        className="bg-[#F5F5F0] dark:bg-[#E8E8E2] shadow-[0_4px_24px_rgba(0,0,0,0.35)] w-[110px] sm:w-[clamp(130px,28vw,160px)]"
         style={{
-          padding: "10px 10px 40px 10px",
+          backgroundColor: "#F5F5F0",
+          width: "clamp(120px, 40vw, 160px)",
+          padding: "8px 8px 36px 8px",
           borderRadius: "2px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.35)",
+          display: "flex",
+          flexDirection: "column" as const,
         }}
       >
         {/* Photo area */}
@@ -45,6 +49,7 @@ export function PolaroidCard({ polaroid, index }: Props) {
             overflow: "hidden",
             backgroundColor: "#1A1A1A",
             position: "relative",
+            flexShrink: 0,
           }}
         >
           {polaroid.src ? (
@@ -101,13 +106,12 @@ export function PolaroidCard({ polaroid, index }: Props) {
         <p
           style={{
             fontFamily: '"Caveat", cursive',
-            fontSize: "13px",
+            fontSize: "clamp(11px, 2.5vw, 13px)",
             color: "#2C2C2C",
             textAlign: "center",
-            marginTop: "8px",
+            marginTop: "6px",
             marginBottom: 0,
             lineHeight: 1.2,
-            letterSpacing: "0.01em",
           }}
         >
           {polaroid.caption}

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Button } from "../ui/Button";
 import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { PolaroidCarousel } from "../ui/PolaroidCarousel";
@@ -31,7 +30,7 @@ export const HeroSection: React.FC = () => {
 
   return (
     <Section id="hero" className="min-h-screen flex items-center">
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-3xl overflow-hidden">
         {/* Text content */}
         <div className="space-y-8">
           <Badge variant="pulse" className="text-xs">
@@ -40,7 +39,7 @@ export const HeroSection: React.FC = () => {
 
           <h1
             ref={headlineRef}
-            className="text-display-2xl font-serif text-text-primary leading-[0.9] tracking-tight"
+            className="text-display-2xl font-serif text-text-primary leading-[0.9] tracking-tight break-words"
           >
             {personal.name.split(" ").map((part, i, arr) => (
               <span
@@ -62,43 +61,12 @@ export const HeroSection: React.FC = () => {
           >
             {personal.tagline}
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.0 }}
-            className="flex flex-col sm:flex-row gap-4 pt-4"
-          >
-            <Button
-              variant="primary"
-              size="lg"
-              magnetic
-              onClick={() =>
-                document
-                  .querySelector("#call")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Get in touch
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() =>
-                document
-                  .querySelector("#work")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              View work
-            </Button>
-          </motion.div>
         </div>
       </div>
 
       {/* Polaroid strip — sits below the hero text + 3D area */}
       <div
-        className="w-full mt-12 md:mt-16"
+        className="w-full max-w-[100vw] mt-12 md:mt-16 overflow-hidden"
         style={{ position: "relative", zIndex: 1 }}
       >
         <PolaroidCarousel />

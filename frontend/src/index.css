@@ -77,9 +77,14 @@ body::before {
   background: var(--text-muted);
 }
 
-/* ── Polaroid carousel — hide scrollbar ── */
-.polaroid-track::-webkit-scrollbar {
-  display: none;
+/* ── Polaroid infinite marquee ── */
+@keyframes polaroid-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ── Focus ── */
