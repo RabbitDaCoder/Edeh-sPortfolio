@@ -13,6 +13,7 @@ import skillRoutes from "../../modules/skills/skills.routes";
 import testimonialRoutes from "../../modules/testimonials/testimonials.routes";
 import profileRoutes from "../../modules/profile/profile.routes";
 import uploadRoutes from "../../modules/upload/upload.routes";
+import polaroidRoutes from "../../modules/polaroids/polaroids.routes";
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use("/skills", skillRoutes);
 router.use("/testimonials", testimonialRoutes);
 router.use("/profile", profileRoutes);
 router.use("/upload", uploadRoutes);
+router.use("/polaroids", polaroidRoutes);
 
 export default router;

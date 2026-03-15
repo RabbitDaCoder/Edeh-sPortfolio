@@ -8,7 +8,7 @@ export interface ProjectData {
   index: string;
   name: string;
   description: string;
-  stack: string[];
+  tags: string[];
   github?: string;
   live?: string;
   typographicMark: string;
@@ -17,10 +17,10 @@ export interface ProjectData {
 /** Convert portfolio Project to card-local ProjectData */
 export function toProjectData(p: Project): ProjectData {
   return {
-    index: p.index,
+    index: String(p.order).padStart(2, "0"),
     name: p.name,
     description: p.description,
-    stack: p.stack,
+    tags: p.tags,
     github: p.githubUrl,
     live: p.liveUrl,
     typographicMark: p.typographicMark,
@@ -72,13 +72,11 @@ export function ProjectCard({
             </p>
           )}
           <div className="mt-4 flex flex-wrap gap-2">
-            {(isPeek ? project.stack.slice(0, 3) : project.stack).map(
-              (tech) => (
-                <Badge key={tech} variant="outline" className="text-xs">
-                  {tech}
-                </Badge>
-              ),
-            )}
+            {(isPeek ? project.tags.slice(0, 3) : project.tags).map((tech) => (
+              <Badge key={tech} variant="outline" className="text-xs">
+                {tech}
+              </Badge>
+            ))}
           </div>
           {!isPeek && (
             <div className="mt-6 flex gap-3">
@@ -157,7 +155,7 @@ export function MobileProjectCard({ project }: { project: ProjectData }) {
             {project.description}
           </p>
           <div className="flex flex-wrap gap-2 pt-1">
-            {project.stack.map((tech) => (
+            {project.tags.map((tech) => (
               <Badge key={tech} variant="outline" className="text-xs">
                 {tech}
               </Badge>

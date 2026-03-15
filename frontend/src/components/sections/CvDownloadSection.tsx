@@ -44,7 +44,7 @@ export const CvDownloadSection: React.FC = () => {
     } else {
       // Fallback to static file
       const link = document.createElement("a");
-      link.href = CV.publicPath;
+      link.href = `/${CV.filename}`;
       link.download = CV.filename;
       document.body.appendChild(link);
       link.click();

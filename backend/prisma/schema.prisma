@@ -19,6 +19,8 @@ enum TimelineType {
   VOLUNTEER
   ACHIEVEMENT
   PLAN
+  BLOCKCHAIN
+  FOUNDER
 }
 
 model User {
@@ -82,9 +84,12 @@ model CareerTimeline {
   title        String
   organisation String?
   description  String?
+  date         String?
   startDate    DateTime
   endDate      DateTime?
   current      Boolean      @default(false)
+  points       String[]
+  keySkills    String[]
   order        Int
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -94,20 +99,23 @@ model Achievement {
   id          String   @id @default(uuid())
   title       String
   description String?
-  date        DateTime?
+  date        String?
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
 }
 
 model Download {
-  id        String   @id @default(uuid())
-  label     String
-  fileUrl   String
-  publicId  String?
-  version   String?
-  active    Boolean  @default(true)
-  downloads Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  label       String
+  fileUrl     String
+  publicId    String?
+  version     String?
+  headline    String?
+  lastUpdated String?
+  active      Boolean  @default(true)
+  downloads   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model NewsletterSubscriber {
@@ -131,8 +139,10 @@ model Project {
   name            String
   slug            String   @unique
   description     String
+  longDescription String?
   stack           String[]
   tags            String[]
+  projectType     String   @default("personal")
   featured        Boolean  @default(false)
   liveUrl         String?
   githubUrl       String?
@@ -151,6 +161,10 @@ enum TechCategory {
   DEVOPS
   THREED
   TOOLS
+  STATE
+  BLOCKCHAIN
+  OTHER
+  LANGUAGES
 }
 
 model Skill {
@@ -163,33 +177,54 @@ model Skill {
 }
 
 model Testimonial {
+  id          String   @id @default(uuid())
+  name        String
+  role        String
+  designation String?
+  company     String
+  quote       String
+  initials    String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteProfile {
+  id            String   @id @default(uuid())
+  firstName     String
+  middleName    String?
+  lastName      String
+  alias         String?
+  tagline       String?
+  subTagline    String?
+  fullHeadline  String?
+  bio1          String?
+  bio2          String?
+  pullQuote     String?
+  availability  String   @default("Available for work")
+  email         String
+  phone         String?
+  location      String?
+  locationShort String?
+  timezone      String?
+  github        String?
+  linkedin      String?
+  youtube       String?
+  twitter       String?
+  portfolio     String?
+  calendly      String?
+  updatedAt     DateTime @updatedAt
+}
+
+model Polaroid {
   id        String   @id @default(uuid())
-  name      String
-  role      String
-  company   String
-  quote     String
+  src       String   @default("")
+  alt       String
+  caption   String
+  rotation  Float    @default(0)
   order     Int      @default(0)
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model SiteProfile {
-  id           String   @id @default(uuid())
-  firstName    String
-  middleName   String?
-  lastName     String
-  tagline      String?
-  bio1         String?
-  bio2         String?
-  pullQuote    String?
-  availability String   @default("Available for work")
-  email        String
-  location     String?
-  timezone     String?
-  github       String?
-  linkedin     String?
-  youtube      String?
-  twitter      String?
-  updatedAt    DateTime @updatedAt
 }

@@ -12,20 +12,17 @@ gsap.registerPlugin(ScrollTrigger);
 
 function TestimonialCard({
   name,
-  role,
+  designation,
   company,
   quote,
+  initials,
 }: {
   name: string;
-  role: string;
+  designation: string;
   company: string;
   quote: string;
+  initials: string;
 }) {
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .join("");
-
   return (
     <Card className="p-6 space-y-4 h-full flex flex-col">
       <p className="text-text-muted text-sm leading-relaxed flex-1 italic">
@@ -38,7 +35,7 @@ function TestimonialCard({
         <div>
           <p className="text-sm font-semibold text-text-primary">{name}</p>
           <p className="text-xs text-text-muted">
-            {role}, {company}
+            {designation}, {company}
           </p>
         </div>
       </div>
@@ -67,9 +64,10 @@ function MobileTestimonials({ items }: { items: typeof TESTIMONIALS }) {
             <div key={t.id} className="min-w-0 flex-[0_0_100%] px-2">
               <TestimonialCard
                 name={t.name}
-                role={t.role}
+                designation={t.designation}
                 company={t.company}
                 quote={t.quote}
+                initials={t.initials}
               />
             </div>
           ))}
@@ -134,9 +132,10 @@ export const TestimonialsSection: React.FC = () => {
             <div key={t.id} className="testimonial-card">
               <TestimonialCard
                 name={t.name}
-                role={t.role}
+                designation={t.designation}
                 company={t.company}
                 quote={t.quote}
+                initials={t.initials}
               />
             </div>
           ))}

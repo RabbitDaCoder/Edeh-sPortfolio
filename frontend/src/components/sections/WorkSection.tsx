@@ -66,7 +66,7 @@ function MobileWork({
         <div ref={emblaRef} className="overflow-hidden">
           <div className="flex">
             {projects.map((p) => (
-              <MobileProjectCard key={p.index} project={p} />
+              <MobileProjectCard key={p.name} project={p} />
             ))}
           </div>
         </div>
@@ -96,7 +96,9 @@ export const WorkSection: React.FC = () => {
     ? featuredRaw.map(toProjectData)
     : fallbackProjects;
 
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  );
   const [activeCard, setActiveCard] = useState(0);
 
   const pinWrapperRef = useRef<HTMLDivElement>(null);

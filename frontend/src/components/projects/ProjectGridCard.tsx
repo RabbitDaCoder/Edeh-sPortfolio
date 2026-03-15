@@ -17,7 +17,7 @@ export const ProjectGridCard: React.FC<ProjectCardProps> = ({ project }) => {
       {/* Header: index + mark */}
       <div className="flex items-start justify-between">
         <span className="font-serif text-display-md text-text-muted leading-none select-none">
-          {project.index}
+          {String(project.order).padStart(2, "0")}
         </span>
         <span className="font-serif text-3xl text-text-muted/10 select-none pointer-events-none">
           {project.typographicMark}
@@ -36,7 +36,7 @@ export const ProjectGridCard: React.FC<ProjectCardProps> = ({ project }) => {
 
       {/* Stack tags */}
       <div className="flex flex-wrap gap-2">
-        {project.stack.map((tech) => (
+        {project.tags.map((tech) => (
           <Badge key={tech} variant="outline" className="text-xs">
             {tech}
           </Badge>

@@ -10,30 +10,44 @@ interface CareerEntry {
     | "FREELANCE"
     | "VOLUNTEER"
     | "ACHIEVEMENT"
-    | "PLAN";
+    | "PLAN"
+    | "BLOCKCHAIN"
+    | "FOUNDER";
   title: string;
   organisation?: string;
   description?: string;
+  date?: string;
   startDate: string;
   endDate?: string;
   current: boolean;
+  points?: string[];
+  keySkills?: string[];
+  order?: number;
 }
 
 const TYPE_REVERSE: Record<string, CareerEntry["type"]> = {
   work: "JOB",
-  founder: "FREELANCE",
+  founder: "FOUNDER",
   education: "EDUCATION",
+  freelance: "FREELANCE",
+  volunteer: "VOLUNTEER",
+  plan: "PLAN",
+  blockchain: "BLOCKCHAIN",
 };
 
 const FALLBACK_ENTRIES: CareerEntry[] = EXPERIENCES.map((e) => ({
   id: e.id,
   type: TYPE_REVERSE[e.type] ?? "JOB",
-  title: e.role,
+  title: e.title,
   organisation: e.organisation,
   description: e.description,
-  startDate: e.period.split(" — ")[0] + "-01-01",
-  endDate: e.period.includes("Present") ? undefined : e.period.split(" — ")[1] + "-01-01",
-  current: e.period.includes("Present"),
+  date: e.date,
+  startDate: e.startDate,
+  endDate: e.endDate ?? undefined,
+  current: e.current,
+  points: e.points,
+  keySkills: e.keySkills,
+  order: e.order,
 }));
 
 export const useCareerKey = {

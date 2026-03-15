@@ -16,17 +16,18 @@ export function useProjects() {
         const { data } = await apiClient.get("/projects?published=true");
         const items = data.data;
         if (!items?.length) return PROJECTS;
-        return items.map((p: any, i: number) => ({
+        return items.map((p: any) => ({
           id: p.id,
-          index: String(i + 1).padStart(2, "0"),
           name: p.name,
           description: p.description,
-          stack: p.stack ?? [],
-          tags: p.tags ?? [],
+          longDescription: p.longDescription || "",
+          tags: p.tags ?? p.stack ?? [],
+          projectType: p.projectType || "personal",
           featured: p.featured,
           liveUrl: p.liveUrl || undefined,
           githubUrl: p.githubUrl || undefined,
           typographicMark: p.typographicMark || p.name.charAt(0),
+          order: p.order ?? 0,
         }));
       } catch {
         return PROJECTS;

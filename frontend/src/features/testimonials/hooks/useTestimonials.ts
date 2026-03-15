@@ -18,9 +18,15 @@ export function useTestimonials() {
         return items.map((t: any) => ({
           id: t.id,
           name: t.name,
-          role: t.role,
+          designation: t.designation ?? t.role ?? "",
           company: t.company,
           quote: t.quote,
+          initials:
+            t.initials ??
+            t.name
+              .split(" ")
+              .map((w: string) => w[0])
+              .join(""),
         }));
       } catch {
         return TESTIMONIALS;

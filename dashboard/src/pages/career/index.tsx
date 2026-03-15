@@ -184,6 +184,8 @@ function CareerFormModal({
     defaultValues: isEdit
       ? {
           ...entry,
+          organisation: entry.organisation ?? "",
+          description: entry.description ?? "",
           startDate: entry.startDate?.slice(0, 10),
           endDate: entry.endDate?.slice(0, 10) ?? "",
         }
@@ -283,7 +285,10 @@ function CareerFormModal({
             </label>
           </div>
           {mutation.isError && (
-            <p className="text-sm text-red-500">Failed to save.</p>
+            <p className="text-sm text-red-500">
+              {(mutation.error as any)?.response?.data?.error?.message ||
+                "Failed to save."}
+            </p>
           )}
           <button
             type="submit"

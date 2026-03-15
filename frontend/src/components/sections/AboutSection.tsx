@@ -2,15 +2,17 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Section } from "../layout/Section";
 import { Card } from "../ui/Card";
-import { Code2, Box, Cpu, MessageSquare } from "lucide-react";
+import { Monitor, Globe, Server, Sparkles, Cpu, Users } from "lucide-react";
 import { PERSONAL, SERVICES } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
-  Code2,
-  Box,
+  Monitor,
+  Globe,
+  Server,
+  Sparkles,
   Cpu,
-  MessageSquare,
+  Users,
 };
 
 export const AboutSection: React.FC = () => {
@@ -95,7 +97,7 @@ export const AboutSection: React.FC = () => {
         {SERVICES.map((service) => {
           const Icon = ICON_MAP[service.icon];
           return (
-            <Card key={service.id} hover="scale" className="p-6 space-y-3">
+            <Card key={service.title} hover="scale" className="p-6 space-y-3">
               {Icon && <Icon className="w-5 h-5 text-text-muted" />}
               <h3 className="text-base font-semibold text-text-primary">
                 {service.title}

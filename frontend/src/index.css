@@ -77,6 +77,11 @@ body::before {
   background: var(--text-muted);
 }
 
+/* ── Polaroid carousel — hide scrollbar ── */
+.polaroid-track::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Focus ── */
 :focus-visible {
   outline: 2px solid var(--text-primary);

@@ -130,7 +130,8 @@ export const AchievementsSection: React.FC = () => {
         id: a.id,
         title: a.title,
         description: a.description ?? "",
-        date: formatDate(a.date ?? a.createdAt),
+        date: a.date ?? "",
+        order: a.order ?? 0,
       }))
     : FALLBACK_ACHIEVEMENTS;
 

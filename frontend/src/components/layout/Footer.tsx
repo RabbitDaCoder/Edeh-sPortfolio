@@ -6,7 +6,7 @@ import { useProfile } from "../../features/profile/hooks/useProfile";
 export const Footer: React.FC = () => {
   const { data: personal = PERSONAL } = useProfile();
   const currentYear = new Date().getFullYear();
-  const fullName = `${personal.name.first} ${personal.name.middle} ${personal.name.last}`;
+  const fullName = personal.name;
 
   const socialLinks = [
     {

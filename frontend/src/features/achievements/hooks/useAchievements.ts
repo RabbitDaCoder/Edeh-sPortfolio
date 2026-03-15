@@ -7,6 +7,7 @@ interface AchievementEntry {
   title: string;
   description?: string;
   date?: string;
+  order: number;
   createdAt: string;
 }
 
@@ -14,7 +15,8 @@ const FALLBACK_ENTRIES: AchievementEntry[] = ACHIEVEMENTS.map((a) => ({
   id: a.id,
   title: a.title,
   description: a.description,
-  date: a.date ? `${a.date}-01-01` : undefined,
+  date: a.date,
+  order: a.order,
   createdAt: new Date().toISOString(),
 }));
 

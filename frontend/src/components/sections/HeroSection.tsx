@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
+import { PolaroidCarousel } from "../ui/PolaroidCarousel";
 import { PERSONAL } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
@@ -41,11 +42,16 @@ export const HeroSection: React.FC = () => {
             ref={headlineRef}
             className="text-display-2xl font-serif text-text-primary leading-[0.9] tracking-tight"
           >
-            <span className="hero-line block">{personal.name.first}</span>
-            <span className="hero-line block">{personal.name.middle}</span>
-            <span className="hero-line block text-text-muted">
-              {personal.name.last}
-            </span>
+            {personal.name.split(" ").map((part, i, arr) => (
+              <span
+                key={part}
+                className={`hero-line block ${
+                  i === arr.length - 1 ? "text-text-muted" : ""
+                }`}
+              >
+                {part}
+              </span>
+            ))}
           </h1>
 
           <motion.p
@@ -88,6 +94,14 @@ export const HeroSection: React.FC = () => {
             </Button>
           </motion.div>
         </div>
+      </div>
+
+      {/* Polaroid strip — sits below the hero text + 3D area */}
+      <div
+        className="w-full mt-12 md:mt-16"
+        style={{ position: "relative", zIndex: 1 }}
+      >
+        <PolaroidCarousel />
       </div>
 
       {/* Scroll indicator */}

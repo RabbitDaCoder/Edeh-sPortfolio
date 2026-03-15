@@ -11,6 +11,7 @@ import {
   FolderKanban,
   Cpu,
   MessageSquare,
+  Image,
   Settings,
   Menu,
   X,
@@ -52,6 +53,7 @@ const navGroups: NavGroup[] = [
       { to: "/career", icon: Briefcase, label: "Career" },
       { to: "/achievements", icon: Trophy, label: "Achievements" },
       { to: "/testimonials", icon: MessageSquare, label: "Testimonials" },
+      { to: "/polaroids", icon: Image, label: "Polaroids" },
     ],
   },
   {

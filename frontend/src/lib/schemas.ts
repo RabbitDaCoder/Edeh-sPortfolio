@@ -136,7 +136,7 @@ export function projectSchema(project: {
   name: string;
   slug: string;
   description: string;
-  stack: string[];
+  tags: string[];
   coverImage?: string | null;
   liveUrl?: string | null;
   githubUrl?: string | null;
@@ -149,7 +149,7 @@ export function projectSchema(project: {
     url: project.liveUrl ?? `${SEO_DEFAULTS.siteUrl}/projects`,
     ...(project.githubUrl && { codeRepository: project.githubUrl }),
     image: project.coverImage ?? SEO_DEFAULTS.defaultOgImage,
-    programmingLanguage: project.stack.join(", "),
+    programmingLanguage: project.tags.join(", "),
     author: {
       "@type": "Person",
       name: "Edeh Chinedu Daniel",

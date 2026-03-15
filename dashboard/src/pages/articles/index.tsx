@@ -193,6 +193,7 @@ function ArticleFormModal({
     defaultValues: isEdit
       ? {
           ...article,
+          excerpt: article.excerpt ?? "",
           coverImage: article.coverImage ?? "",
           tags: article.tags?.join(", ") ?? "",
           metaTitle: article.metaTitle ?? "",
@@ -285,7 +286,8 @@ function ArticleFormModal({
           </label>
           {mutation.isError && (
             <p className="text-sm text-red-500">
-              Failed to save. Please try again.
+              {(mutation.error as any)?.response?.data?.error?.message ||
+                "Failed to save. Please try again."}
             </p>
           )}
           <button

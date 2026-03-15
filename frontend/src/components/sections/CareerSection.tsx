@@ -12,24 +12,27 @@ import { Briefcase, GraduationCap, Rocket, ChevronRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type FilterType = "all" | "work" | "education" | "founder";
+type FilterType = "all" | "work" | "education" | "founder" | "blockchain";
 
 const TYPE_MAP: Record<string, Experience["type"]> = {
   JOB: "work",
-  FREELANCE: "founder",
+  FREELANCE: "freelance",
   EDUCATION: "education",
-  VOLUNTEER: "work",
+  VOLUNTEER: "volunteer",
   ACHIEVEMENT: "work",
-  PLAN: "work",
+  PLAN: "plan",
+  BLOCKCHAIN: "blockchain",
+  FOUNDER: "founder",
 };
 
-const TYPE_CONFIG: Record<
-  Experience["type"],
-  { icon: typeof Briefcase; label: string }
-> = {
+const TYPE_CONFIG: Record<string, { icon: typeof Briefcase; label: string }> = {
   work: { icon: Briefcase, label: "Work" },
   education: { icon: GraduationCap, label: "Education" },
   founder: { icon: Rocket, label: "Founder" },
+  freelance: { icon: Briefcase, label: "Freelance" },
+  volunteer: { icon: GraduationCap, label: "Volunteer" },
+  plan: { icon: Rocket, label: "Plan" },
+  blockchain: { icon: Rocket, label: "Blockchain" },
 };
 
 /* ── Single timeline card ─────────────────────────────────────────── */
@@ -38,7 +41,7 @@ function TimelineCard({ entry, index }: { entry: Experience; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const isEven = index % 2 === 0;
-  const Icon = TYPE_CONFIG[entry.type].icon;
+  const Icon = TYPE_CONFIG[entry.type]?.icon ?? Briefcase;
 
   return (
     <div
@@ -57,7 +60,7 @@ function TimelineCard({ entry, index }: { entry: Experience; index: number }) {
         <div className="group relative border border-border rounded-lg p-5 sm:p-6 bg-surface/50 backdrop-blur-sm hover:border-text-muted/30 transition-colors duration-300">
           {/* Period chip — top-right corner */}
           <span className="absolute top-4 right-4 text-[10px] font-mono tracking-widest text-text-muted uppercase">
-            {entry.period}
+            {entry.date}
           </span>
 
           {/* Type icon + label */}
@@ -69,13 +72,13 @@ function TimelineCard({ entry, index }: { entry: Experience; index: number }) {
               variant="outline"
               className="text-[10px] uppercase tracking-wider"
             >
-              {TYPE_CONFIG[entry.type].label}
+              {TYPE_CONFIG[entry.type]?.label ?? entry.type}
             </Badge>
           </div>
 
           {/* Role */}
           <h3 className="text-base sm:text-lg font-semibold text-text-primary leading-tight pr-20">
-            {entry.role}
+            {entry.title}
           </h3>
 
           {/* Organisation */}
@@ -151,11 +154,17 @@ export const CareerSection: React.FC = () => {
   const experiences: Experience[] = (raw ?? []).length
     ? (raw ?? []).map((e: any) => ({
         id: e.id,
-        role: e.title,
+        type: TYPE_MAP[e.type] ?? "work",
+        title: e.title ?? "",
         organisation: e.organisation ?? "",
         description: e.description ?? "",
-        period: formatPeriod(e.startDate, e.endDate, e.current),
-        type: TYPE_MAP[e.type] ?? "work",
+        date: e.date ?? formatPeriod(e.startDate, e.endDate, e.current),
+        startDate: e.startDate ?? "",
+        endDate: e.endDate ?? null,
+        current: e.current ?? false,
+        points: e.points ?? [],
+        keySkills: e.keySkills ?? [],
+        order: e.order ?? 0,
       }))
     : EXPERIENCES;
 
@@ -205,7 +214,9 @@ export const CareerSection: React.FC = () => {
 
           {/* Filter pills */}
           <div className="flex gap-2">
-            {(["all", "work", "founder", "education"] as const).map((type) => (
+            {(
+              ["all", "work", "founder", "blockchain", "education"] as const
+            ).map((type) => (
               <Button
                 key={type}
                 variant={filter === type ? "primary" : "ghost"}

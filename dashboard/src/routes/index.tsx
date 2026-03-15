@@ -46,6 +46,11 @@ const TestimonialsPage = React.lazy(() =>
     default: m.TestimonialsPage,
   })),
 );
+const PolaroidsPage = React.lazy(() =>
+  import("../pages/polaroids").then((m) => ({
+    default: m.PolaroidsPage,
+  })),
+);
 const SettingsPage = React.lazy(() =>
   import("../pages/settings").then((m) => ({ default: m.SettingsPage })),
 );
@@ -75,6 +80,7 @@ export const router = createBrowserRouter([
       { path: "projects", element: <ProjectsPage /> },
       { path: "skills", element: <SkillsPage /> },
       { path: "testimonials", element: <TestimonialsPage /> },
+      { path: "polaroids", element: <PolaroidsPage /> },
       { path: "settings", element: <SettingsPage /> },
     ],
   },

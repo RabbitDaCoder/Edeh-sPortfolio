@@ -140,7 +140,11 @@ function AchievementFormModal({
   } = useForm<AchievementForm>({
     resolver: zodResolver(achievementSchema),
     defaultValues: isEdit
-      ? { ...achievement, date: achievement.date?.slice(0, 10) ?? "" }
+      ? {
+          ...achievement,
+          description: achievement.description ?? "",
+          date: achievement.date?.slice(0, 10) ?? "",
+        }
       : {},
   });
 
@@ -192,7 +196,10 @@ function AchievementFormModal({
             <input type="date" {...register("date")} className="input-field" />
           </Field>
           {mutation.isError && (
-            <p className="text-sm text-red-500">Failed to save.</p>
+            <p className="text-sm text-red-500">
+              {(mutation.error as any)?.response?.data?.error?.message ||
+                "Failed to save."}
+            </p>
           )}
           <button
             type="submit"

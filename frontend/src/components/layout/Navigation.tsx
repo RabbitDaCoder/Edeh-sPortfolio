@@ -76,8 +76,8 @@ export const Navigation: React.FC = () => {
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <button
-                key={link.href}
-                onClick={() => handleNavClick(link.href)}
+                key={link.id}
+                onClick={() => handleNavClick(`#${link.id}`)}
                 className="text-sm text-text-muted hover:text-text-primary transition-colors relative group"
               >
                 {link.label}
@@ -143,11 +143,11 @@ export const Navigation: React.FC = () => {
                 <div className="flex flex-col gap-4">
                   {navLinks.map((link, i) => (
                     <motion.button
-                      key={link.href}
+                      key={link.id}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      onClick={() => handleNavClick(link.href)}
+                      onClick={() => handleNavClick(`#${link.id}`)}
                       className="text-left text-text-muted hover:text-text-primary transition-colors py-2 border-b border-border"
                     >
                       {link.label}

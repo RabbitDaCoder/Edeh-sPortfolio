@@ -2,14 +2,17 @@ import React, { useMemo } from "react";
 import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { useSkills } from "../../features/skills/hooks/useSkills";
-import { TECH_CATEGORY_LABELS, type TechCategory } from "../../data/portfolio";
+import {
+  SKILL_CATEGORY_LABELS,
+  type SkillCategory,
+} from "../../data/portfolio";
 
 export const SkillsSection: React.FC = () => {
   const { data: skills } = useSkills();
 
   const grouped = useMemo(() => {
     if (!skills?.length) return [];
-    const map = new Map<TechCategory, string[]>();
+    const map = new Map<SkillCategory, string[]>();
     for (const tech of skills) {
       const list = map.get(tech.category) ?? [];
       list.push(tech.name);
@@ -17,7 +20,7 @@ export const SkillsSection: React.FC = () => {
     }
     return Array.from(map.entries()).map(([category, items]) => ({
       category,
-      label: TECH_CATEGORY_LABELS[category],
+      label: SKILL_CATEGORY_LABELS[category],
       skills: items,
     }));
   }, [skills]);

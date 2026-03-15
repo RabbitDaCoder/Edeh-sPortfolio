@@ -220,6 +220,10 @@ function ProjectFormModal({
           ...project,
           stack: (project.stack ?? []).join(", "),
           tags: (project.tags ?? []).join(", "),
+          liveUrl: project.liveUrl ?? "",
+          githubUrl: project.githubUrl ?? "",
+          coverImage: project.coverImage ?? "",
+          typographicMark: project.typographicMark ?? "",
         }
       : { featured: false, published: true, order: 0 },
   });
@@ -346,7 +350,10 @@ function ProjectFormModal({
             </label>
           </div>
           {mutation.isError && (
-            <p className="text-sm text-red-500">Failed to save.</p>
+            <p className="text-sm text-red-500">
+              {(mutation.error as any)?.response?.data?.error?.message ||
+                "Failed to save."}
+            </p>
           )}
           <button
             type="submit"

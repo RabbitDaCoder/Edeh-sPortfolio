@@ -91,18 +91,18 @@ export const ContactPage: React.FC = () => {
   };
 
   const seo = useSEO({
-    title: 'Contact — Work With Me',
+    title: "Contact — Work With Me",
     description:
-      'Send a project proposal to Edeh Chinedu Daniel. Available for ' +
-      'freelance web development, IoT consulting, and full-time roles.',
-    canonical: 'https://edehchinedu.dev/contact',
-    ogType: 'website',
+      "Send a project proposal to Edeh Chinedu Daniel. Available for " +
+      "freelance web development, IoT consulting, and full-time roles.",
+    canonical: "https://edehchinedu.dev/contact",
+    ogType: "website",
     keywords: [
-      'Hire Full-Stack Developer Nigeria',
-      'Freelance Web Developer Enugu',
-      'React Developer for Hire',
-      'IoT Consultant Nigeria',
-      'Contact RabbitDaCoder',
+      "Hire Full-Stack Developer Nigeria",
+      "Freelance Web Developer Enugu",
+      "React Developer for Hire",
+      "IoT Consultant Nigeria",
+      "Contact RabbitDaCoder",
     ],
   });
 
@@ -115,8 +115,8 @@ export const ContactPage: React.FC = () => {
       <JsonLD schema={contactPageSchema()} />
       <JsonLD
         schema={breadcrumbSchema([
-          { name: 'Home', url: 'https://edehchinedu.dev' },
-          { name: 'Contact', url: 'https://edehchinedu.dev/contact' },
+          { name: "Home", url: "https://edehchinedu.dev" },
+          { name: "Contact", url: "https://edehchinedu.dev/contact" },
         ])}
       />
       <Section id="contact">
@@ -329,7 +329,7 @@ export const ContactPage: React.FC = () => {
                       Location
                     </p>
                     <p className="text-sm text-text-primary">
-                      {personal.location} ({personal.timezone})
+                      {personal.location}
                     </p>
                   </div>
                   <div>
