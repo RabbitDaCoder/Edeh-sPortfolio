@@ -8,7 +8,7 @@ echo "==> Running Prisma migrations..."
 prisma migrate deploy --schema=backend/prisma/schema.prisma
 
 echo "==> Running seed script..."
-node backend/dist/seed/seed.js || echo "Seed script failed (may already be seeded), continuing..."
+node backend/dist/seed/backend/prisma/seed.js || echo "Seed script failed (may already be seeded), continuing..."
 
 echo "==> Starting server..."
 exec node backend/dist/server.js

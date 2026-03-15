@@ -24,10 +24,13 @@ COPY backend/src backend/src
 COPY backend/tsconfig.json backend/
 RUN npm run build --workspace=backend
 
-# 5. Compile seed script separately (prisma/ is outside src/)
+# 5. Copy frontend portfolio data (seed.ts imports from it)
+COPY frontend/src/data/portfolio.ts frontend/src/data/portfolio.ts
+
+# 6. Compile seed script separately (prisma/ is outside src/)
 RUN npx --prefix backend tsc --esModuleInterop --module commonjs --target ES2020 --moduleResolution node --skipLibCheck --types node --typeRoots backend/node_modules/@types --outDir backend/dist/seed backend/prisma/seed.ts
 
-# 6. Prune dev dependencies for production image
+# 7. Prune dev dependencies for production image
 RUN npm prune --production --workspace=backend
 
 # ─── Stage 2: Production ─────────────────────────────────────────────
