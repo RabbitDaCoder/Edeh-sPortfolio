@@ -44,38 +44,27 @@ export function PolaroidCarousel() {
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        overflow: "hidden",
-        paddingBottom: "1.5rem",
-        paddingTop: "1rem",
-      }}
-    >
+    <div className="w-full overflow-hidden pb-6 pt-4">
       <div
         ref={trackRef}
         onMouseDown={onMouseDown}
         onMouseLeave={onMouseLeave}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
-        className="polaroid-track"
+        className="polaroid-track flex flex-row items-end gap-4 sm:gap-5 overflow-x-auto px-4 sm:px-6 sm:justify-center"
         style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: "1.25rem",
-          justifyContent: "center",
-          alignItems: "flex-end",
-          overflowX: "auto",
           scrollbarWidth: "none",
           cursor: "grab",
-          paddingLeft: "1.5rem",
-          paddingRight: "1.5rem",
           scrollSnapType: "x mandatory",
           WebkitOverflowScrolling: "touch",
         }}
       >
         {polaroids.map((polaroid, i) => (
-          <div key={polaroid.id} style={{ scrollSnapAlign: "center" }}>
+          <div
+            key={polaroid.id}
+            className="snap-center"
+            style={{ flexShrink: 0 }}
+          >
             <PolaroidCard polaroid={polaroid} index={i} />
           </div>
         ))}

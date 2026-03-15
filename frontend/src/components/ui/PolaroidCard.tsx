@@ -31,10 +31,9 @@ export function PolaroidCard({ polaroid, index }: Props) {
     >
       {/* Polaroid frame */}
       <div
-        className="bg-[#F5F5F0] dark:bg-[#E8E8E2] shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
+        className="bg-[#F5F5F0] dark:bg-[#E8E8E2] shadow-[0_4px_24px_rgba(0,0,0,0.35)] w-[110px] sm:w-[clamp(130px,28vw,160px)]"
         style={{
           padding: "10px 10px 40px 10px",
-          width: "clamp(130px, 28vw, 160px)",
           borderRadius: "2px",
         }}
       >
