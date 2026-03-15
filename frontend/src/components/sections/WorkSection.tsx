@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, createRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -96,6 +96,14 @@ export const WorkSection: React.FC = () => {
     ? featuredRaw.map(toProjectData)
     : fallbackProjects;
 
+  const count = projects.length;
+
+  // Dynamic refs for N cards
+  const cardRefs = useMemo(
+    () => Array.from({ length: count }, () => createRef<HTMLDivElement>()),
+    [count],
+  );
+
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== "undefined" && window.innerWidth < 768,
   );
@@ -105,9 +113,6 @@ export const WorkSection: React.FC = () => {
   const headerRef = useRef<HTMLDivElement>(null);
   const scrollHintRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const card1Ref = useRef<HTMLDivElement>(null);
-  const card2Ref = useRef<HTMLDivElement>(null);
-  const card3Ref = useRef<HTMLDivElement>(null);
 
   const setActiveProjectIndex = useSceneStore((s) => s.setActiveProjectIndex);
   const setActiveSection = useSceneStore((s) => s.setActiveSection);
@@ -139,16 +144,12 @@ export const WorkSection: React.FC = () => {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // GSAP deck timeline
+  // GSAP deck timeline — dynamic for N cards
   useEffect(() => {
-    if (isMobile) return;
-    if (
-      !pinWrapperRef.current ||
-      !card1Ref.current ||
-      !card2Ref.current ||
-      !card3Ref.current
-    )
-      return;
+    if (isMobile || count < 2) return;
+    if (!pinWrapperRef.current) return;
+    // Ensure all refs are attached
+    if (cardRefs.some((r) => !r.current)) return;
 
     const ctx = gsap.context(() => {
       // Header reveal
@@ -165,20 +166,25 @@ export const WorkSection: React.FC = () => {
         },
       });
 
+      const transitions = count - 1; // number of peel transitions
+      const segmentDuration = 1 / transitions;
+
       // Pinned deck timeline
       const deckTl = gsap.timeline({
         scrollTrigger: {
           trigger: pinWrapperRef.current,
           start: "top top",
-          end: "+=300%",
+          end: `+=${count * 100}%`,
           pin: true,
           scrub: 1.2,
           anticipatePin: 1,
           onUpdate: (self) => {
             const p = self.progress;
-            if (p < 0.33) setActiveCard(0);
-            else if (p < 0.66) setActiveCard(1);
-            else setActiveCard(2);
+            const idx = Math.min(
+              transitions,
+              Math.floor(p * transitions + 0.5),
+            );
+            setActiveCard(idx);
           },
           onLeave: () => {
             gsap.to(ctaRef.current, { opacity: 1, y: 0, duration: 0.4 });
@@ -196,84 +202,105 @@ export const WorkSection: React.FC = () => {
         0,
       );
 
-      // Card 1 peel (0 -> 0.33)
-      deckTl.to(
-        card1Ref.current,
-        {
-          x: "-110%",
-          rotation: -8,
-          opacity: 0,
-          ease: "power2.inOut",
-          duration: 0.33,
-        },
-        0,
-      );
-      deckTl.to(
-        card2Ref.current,
-        {
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotation: 0,
-          opacity: 1,
-          ease: "power2.inOut",
-          duration: 0.33,
-        },
-        0,
-      );
-      deckTl.to(
-        card3Ref.current,
-        {
-          x: 12,
-          y: 12,
-          scale: 0.97,
-          rotation: 1.5,
-          opacity: 0.85,
-          ease: "power2.inOut",
-          duration: 0.33,
-        },
-        0,
-      );
+      // Build peel animations for each transition
+      for (let t = 0; t < transitions; t++) {
+        const startTime = t * segmentDuration;
+        const topCard = cardRefs[t].current;
+        const nextCard = cardRefs[t + 1].current;
 
-      // Card 2 peel (0.33 -> 0.66)
-      deckTl.to(
-        card2Ref.current,
-        {
-          x: "-110%",
-          rotation: -8,
-          opacity: 0,
-          ease: "power2.inOut",
-          duration: 0.33,
-        },
-        0.33,
-      );
-      deckTl.to(
-        card3Ref.current,
-        {
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotation: 0,
-          opacity: 1,
-          ease: "power2.inOut",
-          duration: 0.33,
-        },
-        0.33,
-      );
+        // Peel top card off to the left
+        deckTl.to(
+          topCard,
+          {
+            x: "-110%",
+            rotation: -8,
+            opacity: 0,
+            ease: "power2.inOut",
+            duration: segmentDuration,
+          },
+          startTime,
+        );
 
-      // Card 3 hold — subtle breathing (0.75 -> 1)
-      deckTl.to(
-        card3Ref.current,
-        { y: -6, duration: 0.17, ease: "sine.inOut", yoyo: true, repeat: 1 },
-        0.75,
-      );
+        // Bring next card to front position
+        deckTl.to(
+          nextCard,
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotation: 0,
+            opacity: 1,
+            ease: "power2.inOut",
+            duration: segmentDuration,
+          },
+          startTime,
+        );
+
+        // Pull card behind next one step closer
+        const behindCard = cardRefs[t + 2]?.current;
+        if (behindCard) {
+          deckTl.to(
+            behindCard,
+            {
+              x: 12,
+              y: 12,
+              scale: 0.97,
+              rotation: 1.5,
+              opacity: 0.85,
+              ease: "power2.inOut",
+              duration: segmentDuration,
+            },
+            startTime,
+          );
+        }
+      }
+
+      // Last card — subtle breathing
+      const lastCard = cardRefs[count - 1].current;
+      if (lastCard) {
+        deckTl.to(
+          lastCard,
+          { y: -6, duration: 0.17, ease: "sine.inOut", yoyo: true, repeat: 1 },
+          1 - 0.25,
+        );
+      }
     }, pinWrapperRef);
 
     return () => ctx.revert();
-  }, [isMobile]);
+  }, [isMobile, count, cardRefs]);
 
   if (isMobile)
     return <MobileWork activeCard={activeCard} projects={projects} />;
+
+  // Single featured project — no deck animation needed
+  if (count < 2) {
+    return (
+      <section
+        ref={pinWrapperRef}
+        id="work"
+        className="relative w-full py-10 md:py-16 lg:py-20 px-4 md:px-8 lg:px-16 bg-surface/30"
+      >
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div>
+            <span className="font-mono text-label text-text-muted uppercase tracking-widest">
+              03 — Work
+            </span>
+            <h2 className="font-serif text-display-xl mt-2">Selected Work</h2>
+          </div>
+          {projects[0] && (
+            <div className="relative w-full h-[70vh] max-h-[540px]">
+              <ProjectCard
+                project={projects[0]}
+                cardRef={cardRefs[0]}
+                variant="top"
+                index={0}
+              />
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   const counter = String(activeCard + 1).padStart(2, "0");
 
@@ -312,29 +339,26 @@ export const WorkSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Card deck */}
+        {/* Card deck — rendered bottom-to-top (last card at back) */}
         <div className="relative w-full flex-1 flex items-center min-h-0">
           <div className="relative w-full h-[70vh] max-h-[540px]">
-            <ProjectCard
-              project={projects[2]}
-              cardRef={card3Ref}
-              variant={activeCard < 2 ? "stack" : "top"}
-              index={2}
-            />
-            <ProjectCard
-              project={projects[1]}
-              cardRef={card2Ref}
-              variant={
-                activeCard === 0 ? "peek" : activeCard === 1 ? "top" : "stack"
-              }
-              index={1}
-            />
-            <ProjectCard
-              project={projects[0]}
-              cardRef={card1Ref}
-              variant={activeCard === 0 ? "top" : "stack"}
-              index={0}
-            />
+            {[...projects].reverse().map((p, reverseIdx) => {
+              const i = count - 1 - reverseIdx; // original index
+              const getVariant = (): "top" | "peek" | "stack" => {
+                if (i === activeCard) return "top";
+                if (i === activeCard + 1) return "peek";
+                return "stack";
+              };
+              return (
+                <ProjectCard
+                  key={`${p.name}-${i}`}
+                  project={p}
+                  cardRef={cardRefs[i]}
+                  variant={getVariant()}
+                  index={i}
+                />
+              );
+            })}
           </div>
         </div>
 
