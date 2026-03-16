@@ -7,13 +7,17 @@ import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useBlogs } from "../../features/blog/hooks/useBlog";
+import { useFeaturedBlogs } from "../../features/blog/hooks/useFeaturedBlogs";
 import { ArrowRight } from "lucide-react";
 
 export const BlogPreviewSection: React.FC = () => {
   const navigate = useNavigate();
-  const { data } = useBlogs(1, 6);
+  const { data: featuredData } = useFeaturedBlogs(6);
+  const { data: allData } = useBlogs(1, 6);
 
-  const posts = data?.items ?? data ?? [];
+  const featured = featuredData ?? [];
+  const fallback = allData?.items ?? allData ?? [];
+  const posts = featured.length > 0 ? featured : fallback;
 
   if (!posts.length) return null;
 
@@ -22,7 +26,7 @@ export const BlogPreviewSection: React.FC = () => {
       <Card hover="lift" className="h-full flex flex-col p-6 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <Badge variant="muted" className="text-xs">
-            {post.tags?.[0] ?? "Blog"}
+            {post.category ?? post.tags?.[0] ?? "Blog"}
           </Badge>
           {post.readTime && (
             <span className="text-xs text-text-muted font-mono whitespace-nowrap">

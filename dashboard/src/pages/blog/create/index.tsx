@@ -1,11 +1,17 @@
-import { useForm } from "react-hook-form";
+import { useState, useEffect, useCallback } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/axios";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Star } from "lucide-react";
 import { ImageUploadField } from "../../../components/ImageUploadField";
+import { MarkdownEditor } from "../../../components/blog/MarkdownEditor";
+import { markdownToHtml } from "../../../utils/markdownToHtml";
+import { BLOG_CATEGORY_GROUPS } from "../../../constants/blog";
+
+const AUTOSAVE_KEY = "draft:blog:create";
 
 const blogSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -17,7 +23,9 @@ const blogSchema = z.object({
     .url("Must be a valid URL")
     .optional()
     .or(z.literal("")),
+  category: z.string().optional(),
   published: z.boolean(),
+  featured: z.boolean(),
   readTime: z.coerce.number().optional(),
   tags: z.string().optional(),
   metaTitle: z.string().optional(),
@@ -26,24 +34,70 @@ const blogSchema = z.object({
 
 type BlogForm = z.infer<typeof blogSchema>;
 
+type EditorMode = "richtext" | "markdown";
+
 export function CreateBlogPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [editorMode, setEditorMode] = useState<EditorMode>("richtext");
+  const [markdownSrc, setMarkdownSrc] = useState("");
 
   const {
     register,
     handleSubmit,
+    control,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<BlogForm>({
     resolver: zodResolver(blogSchema),
-    defaultValues: { published: false },
+    defaultValues: { published: false, featured: false },
   });
 
+  // Load auto-saved draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(AUTOSAVE_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        if (draft.editorMode) setEditorMode(draft.editorMode);
+        if (draft.markdownSrc) setMarkdownSrc(draft.markdownSrc);
+        if (draft.form) {
+          Object.entries(draft.form).forEach(([key, val]) => {
+            setValue(key as keyof BlogForm, val as any);
+          });
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, [setValue]);
+
+  // Auto-save every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const form = getValues();
+      localStorage.setItem(
+        AUTOSAVE_KEY,
+        JSON.stringify({ form, editorMode, markdownSrc }),
+      );
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [getValues, editorMode, markdownSrc]);
+
   const mutation = useMutation({
-    mutationFn: (data: BlogForm) => {
+    mutationFn: async (data: BlogForm) => {
+      let finalContent = data.content;
+
+      if (editorMode === "markdown") {
+        finalContent = await markdownToHtml(markdownSrc);
+      }
+
       const payload = {
         ...data,
+        content: finalContent,
+        contentSource: editorMode,
         coverImage: data.coverImage || undefined,
         tags: data.tags
           ? data.tags
@@ -54,7 +108,11 @@ export function CreateBlogPage() {
       };
       return apiClient.post("blog", payload);
     },
-    onSuccess: () => navigate("/blog"),
+    onSuccess: () => {
+      localStorage.removeItem(AUTOSAVE_KEY);
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
+      navigate("/blog");
+    },
   });
 
   const title = watch("title");
@@ -70,6 +128,19 @@ export function CreateBlogPage() {
       );
     }
   };
+
+  const handleEditorModeChange = useCallback(
+    (mode: EditorMode) => {
+      if (mode === "markdown" && editorMode === "richtext") {
+        setMarkdownSrc(getValues("content") || "");
+      }
+      if (mode === "richtext" && editorMode === "markdown") {
+        setValue("content", markdownSrc);
+      }
+      setEditorMode(mode);
+    },
+    [editorMode, markdownSrc, getValues, setValue],
+  );
 
   return (
     <div className="space-y-6">
@@ -110,14 +181,70 @@ export function CreateBlogPage() {
             />
           </FieldGroup>
 
-          <FieldGroup label="Content" error={errors.content?.message}>
-            <textarea
-              {...register("content")}
-              rows={12}
-              className="input-field resize-y"
-              placeholder="Write your content..."
-            />
+          <FieldGroup label="Category">
+            <select {...register("category")} className="input-field">
+              <option value="">No category</option>
+              {BLOG_CATEGORY_GROUPS.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
           </FieldGroup>
+
+          {/* Editor mode switcher */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              Content
+            </label>
+            <div className="flex items-center gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => handleEditorModeChange("richtext")}
+                className={`px-3 py-1 text-xs rounded-sm border transition-colors ${
+                  editorMode === "richtext"
+                    ? "bg-accent text-background border-accent"
+                    : "border-border text-text-muted hover:text-text-primary"
+                }`}
+              >
+                Rich Text
+              </button>
+              <button
+                type="button"
+                onClick={() => handleEditorModeChange("markdown")}
+                className={`px-3 py-1 text-xs rounded-sm border transition-colors ${
+                  editorMode === "markdown"
+                    ? "bg-accent text-background border-accent"
+                    : "border-border text-text-muted hover:text-text-primary"
+                }`}
+              >
+                Markdown
+              </button>
+            </div>
+            {editorMode === "markdown" ? (
+              <MarkdownEditor
+                value={markdownSrc}
+                onChange={setMarkdownSrc}
+                height={400}
+              />
+            ) : (
+              <textarea
+                {...register("content")}
+                rows={12}
+                className="input-field resize-y"
+                placeholder="Write your content..."
+              />
+            )}
+            {errors.content?.message && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.content.message}
+              </p>
+            )}
+          </div>
 
           <FieldGroup label="Excerpt">
             <textarea
@@ -162,16 +289,29 @@ export function CreateBlogPage() {
             </FieldGroup>
           </div>
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              {...register("published")}
-              className="w-4 h-4 accent-accent"
-            />
-            <span className="text-sm font-medium text-text-primary">
-              Publish immediately
-            </span>
-          </label>
+          <div className="flex items-center gap-6">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                {...register("published")}
+                className="w-4 h-4 accent-accent"
+              />
+              <span className="text-sm font-medium text-text-primary">
+                Publish immediately
+              </span>
+            </label>
+
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                {...register("featured")}
+                className="w-4 h-4 accent-accent"
+              />
+              <span className="text-sm font-medium text-text-primary inline-flex items-center gap-1">
+                <Star className="w-3.5 h-3.5" /> Featured
+              </span>
+            </label>
+          </div>
         </div>
 
         {mutation.isError && (

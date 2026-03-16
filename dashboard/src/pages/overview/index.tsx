@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../lib/axios";
 import {
   FileText,
@@ -11,6 +11,8 @@ import {
   FolderKanban,
   Cpu,
   MessageSquare,
+  Star,
+  X,
 } from "lucide-react";
 
 interface StatCard {
@@ -21,6 +23,8 @@ interface StatCard {
 }
 
 export function OverviewPage() {
+  const queryClient = useQueryClient();
+
   const blog = useQuery({
     queryKey: ["blog"],
     queryFn: () => apiClient.get("blog?limit=1"),
@@ -61,6 +65,30 @@ export function OverviewPage() {
     queryKey: ["testimonials"],
     queryFn: () => apiClient.get("testimonials"),
   });
+  const featuredBlogs = useQuery({
+    queryKey: ["blog", "featured"],
+    queryFn: () => apiClient.get("blog/featured?limit=10"),
+  });
+  const featuredBooks = useQuery({
+    queryKey: ["books", "featured"],
+    queryFn: () => apiClient.get("books/featured?limit=10"),
+  });
+
+  const unfeatureBlog = useMutation({
+    mutationFn: (id: string) => apiClient.patch(`blog/${id}/feature`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
+    },
+  });
+  const unfeatureBook = useMutation({
+    mutationFn: (id: string) => apiClient.patch(`books/${id}/feature`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["books"] });
+    },
+  });
+
+  const featuredBlogList = featuredBlogs.data?.data?.data ?? [];
+  const featuredBookList = featuredBooks.data?.data?.data ?? [];
 
   const stats: StatCard[] = [
     {
@@ -155,6 +183,77 @@ export function OverviewPage() {
             </a>
           );
         })}
+      </div>
+
+      {/* Featured Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Featured Blog Posts */}
+        <div className="border border-border rounded-sm p-5 bg-background">
+          <div className="flex items-center gap-2 mb-4">
+            <Star className="w-5 h-5 text-amber-500" />
+            <h2 className="text-lg font-semibold text-text-primary">
+              Featured Blog Posts
+            </h2>
+          </div>
+          {featuredBlogList.length === 0 ? (
+            <p className="text-sm text-text-muted">
+              No featured blog posts yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {featuredBlogList.map((post: { id: string; title: string }) => (
+                <li
+                  key={post.id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-text-primary truncate mr-2">
+                    {post.title}
+                  </span>
+                  <button
+                    onClick={() => unfeatureBlog.mutate(post.id)}
+                    className="text-text-muted hover:text-red-500 transition-colors shrink-0"
+                    title="Remove from featured"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Featured Books */}
+        <div className="border border-border rounded-sm p-5 bg-background">
+          <div className="flex items-center gap-2 mb-4">
+            <Star className="w-5 h-5 text-amber-500" />
+            <h2 className="text-lg font-semibold text-text-primary">
+              Featured Books
+            </h2>
+          </div>
+          {featuredBookList.length === 0 ? (
+            <p className="text-sm text-text-muted">No featured books yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {featuredBookList.map((book: { id: string; title: string }) => (
+                <li
+                  key={book.id}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-text-primary truncate mr-2">
+                    {book.title}
+                  </span>
+                  <button
+                    onClick={() => unfeatureBook.mutate(book.id)}
+                    className="text-text-muted hover:text-red-500 transition-colors shrink-0"
+                    title="Remove from featured"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

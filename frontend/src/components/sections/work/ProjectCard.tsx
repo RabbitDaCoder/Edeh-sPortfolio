@@ -50,12 +50,12 @@ export function ProjectCard({
         isPeek
           ? "left-[calc(50%+0.5rem)] w-[calc(50%-0.5rem)]"
           : "left-0 w-[calc(50%-0.5rem)]"
-      } bg-surface border border-border rounded-lg overflow-hidden`}
+      } bg-surface border border-border rounded-lg`}
       style={{ transformOrigin: "bottom left" }}
     >
       <div className="flex h-full">
         {/* Left column — details */}
-        <div className="w-[45%] p-6 md:p-8 flex flex-col justify-center">
+        <div className="w-[45%] p-6 md:p-8 flex flex-col">
           <span className="font-serif text-display-xl text-text-muted leading-none select-none">
             {project.index}
           </span>
@@ -78,8 +78,30 @@ export function ProjectCard({
               </Badge>
             ))}
           </div>
+        </div>
+
+        {/* Right column — visual mark */}
+        <div className="relative w-[55%] flex items-center justify-center overflow-hidden h-full">
+          {/* Corner accents */}
+          <span className="absolute top-4 right-4 w-6 h-6 border-t border-r border-border opacity-50" />
+          <span className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-border opacity-50" />
+          {/* Centre rule */}
+          <span className="absolute left-0 top-1/2 w-full h-px bg-border opacity-40" />
+          {/* Typographic mark */}
+          <span
+            className={`font-serif text-[12rem] leading-none text-text-primary ${
+              isPeek ? "opacity-[0.04]" : "opacity-[0.06]"
+            } select-none pointer-events-none absolute -right-8 rotate-[-12deg]`}
+          >
+            {project.typographicMark}
+          </span>
+          {/* Peek fade overlay */}
+          {isPeek && (
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent to-surface/60 pointer-events-none" />
+          )}
+          {/* Icon row — bottom-right */}
           {!isPeek && (
-            <div className="mt-6 flex gap-3">
+            <div className="absolute bottom-6 right-6 flex gap-3 z-10">
               {project.github && (
                 <Button
                   variant="icon"
@@ -101,27 +123,6 @@ export function ProjectCard({
                 </Button>
               )}
             </div>
-          )}
-        </div>
-
-        {/* Right column — visual mark */}
-        <div className="relative w-[55%] flex items-center justify-center overflow-hidden h-full">
-          {/* Corner accents */}
-          <span className="absolute top-4 right-4 w-6 h-6 border-t border-r border-border opacity-50" />
-          <span className="absolute bottom-4 left-4 w-6 h-6 border-b border-l border-border opacity-50" />
-          {/* Centre rule */}
-          <span className="absolute left-0 top-1/2 w-full h-px bg-border opacity-40" />
-          {/* Typographic mark */}
-          <span
-            className={`font-serif text-[12rem] leading-none text-text-primary ${
-              isPeek ? "opacity-[0.04]" : "opacity-[0.06]"
-            } select-none pointer-events-none absolute -right-8 rotate-[-12deg]`}
-          >
-            {project.typographicMark}
-          </span>
-          {/* Peek fade overlay */}
-          {isPeek && (
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent to-surface/60 pointer-events-none" />
           )}
         </div>
       </div>

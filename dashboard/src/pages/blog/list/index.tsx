@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/axios";
 import { Link } from "react-router-dom";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Star } from "lucide-react";
 
 export function BlogListPage() {
   const queryClient = useQueryClient();
@@ -15,6 +15,11 @@ export function BlogListPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`blog/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["blog"] }),
+  });
+
+  const featureMutation = useMutation({
+    mutationFn: (id: string) => apiClient.patch(`blog/${id}/feature`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["blog"] }),
   });
 
@@ -56,6 +61,9 @@ export function BlogListPage() {
                 <th className="text-left p-3 font-medium text-text-muted">
                   Title
                 </th>
+                <th className="text-left p-3 font-medium text-text-muted hidden lg:table-cell">
+                  Category
+                </th>
                 <th className="text-left p-3 font-medium text-text-muted hidden md:table-cell">
                   Status
                 </th>
@@ -74,7 +82,20 @@ export function BlogListPage() {
                   className="border-b border-border last:border-0 hover:bg-surface/50 transition-colors"
                 >
                   <td className="p-3 text-text-primary font-medium">
-                    {post.title}
+                    <div className="flex items-center gap-2">
+                      {post.title}
+                      {post.featured && (
+                        <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                      )}
+                      {post.contentSource === "markdown" && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 rounded">
+                          MD
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="p-3 text-text-muted hidden lg:table-cell">
+                    {post.category || "—"}
                   </td>
                   <td className="p-3 hidden md:table-cell">
                     <span
@@ -92,6 +113,21 @@ export function BlogListPage() {
                   </td>
                   <td className="p-3 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => featureMutation.mutate(post.id)}
+                        className={`p-1.5 rounded-sm hover:bg-surface transition-colors ${
+                          post.featured
+                            ? "text-yellow-500"
+                            : "text-text-muted hover:text-yellow-500"
+                        }`}
+                        title={
+                          post.featured
+                            ? "Remove from featured"
+                            : "Mark as featured"
+                        }
+                      >
+                        <Star className="w-4 h-4" />
+                      </button>
                       <Link
                         to={`/blog/edit/${post.id}`}
                         className="p-1.5 text-text-muted hover:text-text-primary rounded-sm hover:bg-surface transition-colors"

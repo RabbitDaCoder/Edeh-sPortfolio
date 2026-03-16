@@ -24,6 +24,14 @@ export class BookRepository {
     return { books, total };
   }
 
+  async findFeatured(limit: number = 3) {
+    return db.book.findMany({
+      where: { published: true, featured: true },
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
   async create(data: CreateBookInput) {
     return db.book.create({ data });
   }

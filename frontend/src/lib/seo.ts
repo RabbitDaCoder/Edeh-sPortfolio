@@ -9,7 +9,7 @@ export const SEO_DEFAULTS = {
     "and Digital Creator based in Nigeria. Building performant web " +
     "applications, smart IoT systems, and open-source tools with React, " +
     "Node.js, Three.js & TypeScript.",
-  defaultOgImage: "https://edehchinedu.dev/og-default.jpg",
+  defaultOgImage: "https://edehchinedu.dev/og-default.svg",
   defaultOgImageAlt:
     "Edeh Chinedu Daniel — Full-Stack Software Engineer & Digital Creator",
   locale: "en_NG",

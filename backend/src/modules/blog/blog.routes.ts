@@ -13,10 +13,13 @@ import {
 } from "./blog.schema";
 import {
   getBlogs,
+  getFeaturedBlogs,
   getBlogBySlug,
+  getNextPost,
   createBlog,
   updateBlog,
   deleteBlog,
+  toggleBlogFeatured,
 } from "./blog.controller";
 import { z } from "zod";
 
@@ -43,11 +46,57 @@ const router = Router();
  *         name: published
  *         schema:
  *           type: boolean
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: featured
+ *         schema:
+ *           type: boolean
  *     responses:
  *       200:
  *         description: List of blog posts
  */
 router.get("/", validateQuery(getBlogsQuerySchema), getBlogs);
+
+/**
+ * @swagger
+ * /api/v1/blog/featured:
+ *   get:
+ *     summary: Get featured blog posts
+ *     tags: [Blog]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *         default: 3
+ *     responses:
+ *       200:
+ *         description: List of featured blog posts
+ */
+router.get("/featured", getFeaturedBlogs);
+
+/**
+ * @swagger
+ * /api/v1/blog/{slug}/next:
+ *   get:
+ *     summary: Get the next blog post to read after the given slug
+ *     tags: [Blog]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Next blog post
+ *       404:
+ *         description: Current blog post not found
+ */
+router.get("/:slug/next", getNextPost);
 
 /**
  * @swagger
@@ -91,6 +140,12 @@ router.get("/:slug", getBlogBySlug);
  *                 type: string
  *               content:
  *                 type: string
+ *               category:
+ *                 type: string
+ *               featured:
+ *                 type: boolean
+ *               contentSource:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Blog post created
@@ -104,6 +159,28 @@ router.post(
   idempotencyMiddleware,
   createBlog,
 );
+
+/**
+ * @swagger
+ * /api/v1/blog/{id}/feature:
+ *   patch:
+ *     summary: Toggle featured status of a blog post
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog post featured status toggled
+ *       401:
+ *         description: Unauthorized
+ */
+router.patch("/:id/feature", authMiddleware, toggleBlogFeatured);
 
 /**
  * @swagger

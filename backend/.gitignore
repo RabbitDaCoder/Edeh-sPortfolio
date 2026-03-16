@@ -8,6 +8,9 @@ node_modules/
 # Build output
 dist/
 
+# Uploads (never persist locally)
+uploads/
+
 # Logs
 *.log
 

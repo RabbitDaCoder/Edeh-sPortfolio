@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { Readable } from "stream";
 import { downloadService } from "./downloads.service";
 import { success } from "../../utils/apiResponse";
 import { createDownloadSchema, updateDownloadSchema } from "./downloads.schema";
@@ -95,31 +94,42 @@ export async function serveDownload(
       return;
     }
 
-    // Record the download
-    await downloadService.recordDownload(id);
+    const isAbsoluteUrl = download.fileUrl.startsWith("http");
 
-    // Determine filename from the URL or label
-    const urlPath = new URL(download.fileUrl).pathname;
-    const ext = urlPath.substring(urlPath.lastIndexOf("."));
-    const filename = `${download.label}${ext || ".pdf"}`;
-
-    // Fetch file from Cloudinary (node-fetch follows redirects automatically)
-    const upstream = await fetch(download.fileUrl, { redirect: "follow" });
-    if (!upstream.ok || !upstream.body) {
-      res.status(502).json({ error: "Failed to fetch file" });
+    if (!isAbsoluteUrl) {
+      res.status(404).json({
+        error:
+          "File has not been uploaded to cloud storage. Please re-upload via the dashboard.",
+      });
       return;
     }
 
-    const contentType =
-      upstream.headers.get("content-type") || "application/octet-stream";
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    const contentLength = upstream.headers.get("content-length");
-    if (contentLength) res.setHeader("Content-Length", contentLength);
+    // Increment download count (fire-and-forget)
+    downloadService
+      .recordDownload(id)
+      .catch((err) => console.error("Failed to record download:", err));
 
-    // Convert Web ReadableStream to Node Readable and pipe
-    const nodeStream = Readable.fromWeb(upstream.body as any);
-    nodeStream.pipe(res);
+    // For Cloudinary raw files, add fl_attachment to force browser download.
+    // Raw URLs use /raw/upload/ — fl_attachment goes in the path as a "transformation".
+    let downloadUrl = download.fileUrl;
+    const filename = download.label || "download.pdf";
+    const safeFilename = filename.endsWith(".pdf")
+      ? filename
+      : `${filename}.pdf`;
+
+    if (downloadUrl.includes("cloudinary.com")) {
+      const encodedName = encodeURIComponent(safeFilename);
+      // For raw uploads: /raw/upload/v123/... → /raw/upload/fl_attachment:name/v123/...
+      // For image uploads: /image/upload/v123/... → /image/upload/fl_attachment:name/v123/...
+      downloadUrl = downloadUrl.replace(
+        /\/(raw|image|video)\/upload\//,
+        `/$1/upload/fl_attachment:${encodedName}/`,
+      );
+    }
+
+    // Redirect the client to Cloudinary — the browser will download the file
+    // because fl_attachment sets Content-Disposition: attachment on Cloudinary's response.
+    res.redirect(downloadUrl);
   } catch (err) {
     next(err);
   }

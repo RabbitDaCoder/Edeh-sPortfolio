@@ -19,6 +19,20 @@ export async function getBooks(
   }
 }
 
+export async function getFeaturedBooks(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const limit = req.query.limit ? Number(req.query.limit) : 3;
+    const books = await bookService.getFeaturedBooks(limit);
+    success(res, books);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function getBookBySlug(
   req: Request,
   res: Response,
@@ -69,6 +83,20 @@ export async function deleteBook(
     const { id } = req.params;
     await bookService.deleteBook(id);
     success(res, { id });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function toggleBookFeatured(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { id } = req.params;
+    const book = await bookService.toggleFeatured(id);
+    success(res, book);
   } catch (err) {
     next(err);
   }

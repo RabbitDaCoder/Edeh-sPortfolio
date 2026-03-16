@@ -10,6 +10,9 @@ node_modules/
 dist/
 build/
 
+# Uploads (never persist locally)
+uploads/
+
 # Logs
 *.log
 npm-debug.log*

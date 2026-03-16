@@ -14,11 +14,17 @@ import testimonialRoutes from "../../modules/testimonials/testimonials.routes";
 import profileRoutes from "../../modules/profile/profile.routes";
 import uploadRoutes from "../../modules/upload/upload.routes";
 import polaroidRoutes from "../../modules/polaroids/polaroids.routes";
+import {
+  publicCommentRouter,
+  adminCommentRouter,
+} from "../../modules/comments/comment.routes";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
 router.use("/blog", blogRoutes);
+router.use("/blog/:slug/comments", publicCommentRouter);
+router.use("/admin/comments", adminCommentRouter);
 router.use("/articles", articleRoutes);
 router.use("/books", bookRoutes);
 router.use("/career", careerRoutes);

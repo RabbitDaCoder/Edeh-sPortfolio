@@ -7,10 +7,13 @@ interface Blog {
   slug: string;
   excerpt?: string;
   coverImage?: string;
+  category?: string;
   published: boolean;
+  featured: boolean;
   views: number;
   createdAt: string;
   tags: string[];
+  contentSource?: string;
 }
 
 interface BlogPost extends Blog {

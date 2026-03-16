@@ -10,6 +10,7 @@ interface Book {
   price: string;
   fileUrl?: string;
   published: boolean;
+  featured: boolean;
   createdAt: string;
 }
 

@@ -9,15 +9,18 @@ import {
 } from "./books.schema";
 import {
   getBooks,
+  getFeaturedBooks,
   getBookBySlug,
   createBook,
   updateBook,
   deleteBook,
+  toggleBookFeatured,
 } from "./books.controller";
 
 const router = Router();
 
 router.get("/", validateQuery(getBooksQuerySchema), getBooks);
+router.get("/featured", getFeaturedBooks);
 router.get("/:slug", getBookBySlug);
 router.post(
   "/",
@@ -26,6 +29,7 @@ router.post(
   idempotencyMiddleware,
   createBook,
 );
+router.patch("/:id/feature", authMiddleware, toggleBookFeatured);
 router.patch(
   "/:id",
   authMiddleware,

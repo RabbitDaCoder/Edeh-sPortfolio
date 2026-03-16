@@ -26,25 +26,29 @@ export const Navigation: React.FC = () => {
   const navLinks = NAV_LINKS;
 
   const handleNavClick = useCallback(
-    (href: string) => {
+    (link: (typeof navLinks)[number]) => {
       setIsMenuOpen(false);
 
-      if (href.startsWith("#")) {
-        const anchor = href.slice(1);
-        if (isHome) {
-          // On home page — scroll to section
+      // Blog and Books always route to their pages
+      if (link.id === "blog") {
+        navigate("/blog");
+        return;
+      }
+      if (link.id === "books") {
+        navigate("/books");
+        return;
+      }
+
+      const anchor = link.id;
+      if (isHome) {
+        const el = document.getElementById(anchor);
+        el?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        navigate("/");
+        setTimeout(() => {
           const el = document.getElementById(anchor);
           el?.scrollIntoView({ behavior: "smooth" });
-        } else {
-          // On other page — navigate home then scroll
-          navigate("/");
-          setTimeout(() => {
-            const el = document.getElementById(anchor);
-            el?.scrollIntoView({ behavior: "smooth" });
-          }, 100);
-        }
-      } else {
-        navigate(href);
+        }, 100);
       }
     },
     [isHome, navigate],
@@ -77,7 +81,7 @@ export const Navigation: React.FC = () => {
             {navLinks.map((link) => (
               <button
                 key={link.id}
-                onClick={() => handleNavClick(`#${link.id}`)}
+                onClick={() => handleNavClick(link)}
                 className="text-sm text-text-muted hover:text-text-primary transition-colors relative group"
               >
                 {link.label}
@@ -147,7 +151,7 @@ export const Navigation: React.FC = () => {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      onClick={() => handleNavClick(`#${link.id}`)}
+                      onClick={() => handleNavClick(link)}
                       className="text-left text-text-muted hover:text-text-primary transition-colors py-2 border-b border-border"
                     >
                       {link.label}

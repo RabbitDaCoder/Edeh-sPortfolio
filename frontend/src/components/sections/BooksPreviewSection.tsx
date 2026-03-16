@@ -7,13 +7,17 @@ import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useBooks } from "../../features/books/hooks/useBooks";
+import { useFeaturedBooks } from "../../features/books/hooks/useFeaturedBooks";
 import { ArrowRight } from "lucide-react";
 
 export const BooksPreviewSection: React.FC = () => {
   const navigate = useNavigate();
-  const { data } = useBooks(1, 6);
+  const { data: featuredData } = useFeaturedBooks(6);
+  const { data: allData } = useBooks(1, 6);
 
-  const books = data?.items ?? data ?? [];
+  const featured = featuredData ?? [];
+  const fallback = allData?.items ?? allData ?? [];
+  const books = featured.length > 0 ? featured : fallback;
 
   if (!books.length) return null;
 

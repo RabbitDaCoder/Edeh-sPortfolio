@@ -211,3 +211,78 @@ export function contactPageSchema() {
     },
   };
 }
+
+export function buildArticleSchema(post: {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImage?: string | null;
+  category?: string;
+  tags?: string[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  readTime?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.coverImage ? [post.coverImage] : [],
+    datePublished: new Date(post.createdAt).toISOString(),
+    dateModified: post.updatedAt
+      ? new Date(post.updatedAt).toISOString()
+      : new Date(post.createdAt).toISOString(),
+    author: {
+      "@type": "Person",
+      name: "Edeh Chinedu Daniel",
+      url: SEO_DEFAULTS.siteUrl,
+      sameAs: [
+        "https://github.com/RabbitDaCoder",
+        "https://www.linkedin.com/in/edehchinedu20",
+        "https://x.com/EdehChinedu20",
+      ],
+    },
+    publisher: {
+      "@type": "Person",
+      name: "Edeh Chinedu Daniel",
+      url: SEO_DEFAULTS.siteUrl,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SEO_DEFAULTS.siteUrl}/blog/${post.slug}`,
+    },
+    keywords: (post.tags ?? []).join(", "),
+    articleSection: post.category ?? "Technology",
+    wordCount: post.content
+      .replace(/<[^>]+>/g, " ")
+      .split(/\s+/)
+      .filter(Boolean).length,
+    ...(post.readTime && { timeRequired: `PT${post.readTime}M` }),
+  };
+}
+
+export function buildBooksListSchema(
+  books: Array<{
+    title: string;
+    slug: string;
+    coverImage?: string | null;
+    description: string;
+  }>,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Books by Edeh Chinedu Daniel",
+    url: `${SEO_DEFAULTS.siteUrl}/books`,
+    itemListElement: books.map((book, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: book.title,
+      url: `${SEO_DEFAULTS.siteUrl}/books/${book.slug}`,
+      image: book.coverImage,
+      description: book.description,
+    })),
+  };
+}

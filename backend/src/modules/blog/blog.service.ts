@@ -6,8 +6,14 @@ import { ErrorCode } from "../../utils/errorCodes";
 import { logger } from "../../utils/logger";
 
 export class BlogService {
-  async getBlogs(page: number, limit: number, published?: boolean) {
-    const cacheKey = `blogs:page:${page}:limit:${limit}${published !== undefined ? `:published:${published}` : ""}`;
+  async getBlogs(
+    page: number,
+    limit: number,
+    published?: boolean,
+    category?: string,
+    featured?: boolean,
+  ) {
+    const cacheKey = `blogs:page:${page}:limit:${limit}${published !== undefined ? `:published:${published}` : ""}${category ? `:cat:${category}` : ""}${featured !== undefined ? `:featured:${featured}` : ""}`;
 
     const cached = await cacheService.get<any>(cacheKey);
     if (cached) {
@@ -19,12 +25,28 @@ export class BlogService {
       page,
       limit,
       published,
+      category,
+      featured,
     );
 
     const response = { blogs, total };
     await cacheService.set(cacheKey, response, 300);
 
     return response;
+  }
+
+  async getFeaturedBlogs(limit: number = 3) {
+    const cacheKey = `blogs:featured:limit:${limit}`;
+
+    const cached = await cacheService.get<any>(cacheKey);
+    if (cached) {
+      logger.debug({ cacheKey }, "Cache hit for featured blogs");
+      return cached;
+    }
+
+    const blogs = await blogRepository.findFeatured(limit);
+    await cacheService.set(cacheKey, blogs, 300);
+    return blogs;
   }
 
   async getBlogBySlug(slug: string) {
@@ -52,7 +74,7 @@ export class BlogService {
 
   async createBlog(data: CreateBlogInput) {
     const blog = await blogRepository.create(data);
-    await cacheService.invalidatePattern("blogs:page:*");
+    await cacheService.invalidatePattern("blogs:*");
     return blog;
   }
 
@@ -64,7 +86,7 @@ export class BlogService {
 
     const updated = await blogRepository.update(id, data);
     await cacheService.del(`blog:slug:${blog.slug}`);
-    await cacheService.invalidatePattern("blogs:page:*");
+    await cacheService.invalidatePattern("blogs:*");
 
     return updated;
   }
@@ -77,7 +99,29 @@ export class BlogService {
 
     await blogRepository.delete(id);
     await cacheService.del(`blog:slug:${blog.slug}`);
-    await cacheService.invalidatePattern("blogs:page:*");
+    await cacheService.invalidatePattern("blogs:*");
+  }
+
+  async toggleFeatured(id: string) {
+    const blog = await blogRepository.findById(id);
+    if (!blog) {
+      throw new AppError(ErrorCode.BLOG_NOT_FOUND);
+    }
+
+    const updated = await blogRepository.update(id, {
+      featured: !blog.featured,
+    });
+    await cacheService.del(`blog:slug:${blog.slug}`);
+    await cacheService.invalidatePattern("blogs:*");
+    return updated;
+  }
+
+  async getNextPost(slug: string) {
+    const current = await blogRepository.findBySlug(slug);
+    if (!current) {
+      throw new AppError(ErrorCode.BLOG_NOT_FOUND);
+    }
+    return blogRepository.findNextPost(slug, current.createdAt);
   }
 }
 

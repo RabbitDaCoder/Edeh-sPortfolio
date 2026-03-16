@@ -57,6 +57,8 @@ const ContactPage = React.lazy(() =>
 const ProjectsPage = React.lazy(() =>
   import("./pages/Projects").then((m) => ({ default: m.ProjectsPage })),
 );
+const PrivacyPage = React.lazy(() => import("./pages/legal/PrivacyPage"));
+const TermsPage = React.lazy(() => import("./pages/legal/TermsPage"));
 
 // Suspense fallback
 const PageFallback = () => (
@@ -187,6 +189,24 @@ export function App() {
                       <ErrorBoundary>
                         <ProjectsPage />
                       </ErrorBoundary>
+                    </React.Suspense>
+                  }
+                />
+
+                {/* Legal Routes */}
+                <Route
+                  path="/privacy"
+                  element={
+                    <React.Suspense fallback={<PageFallback />}>
+                      <PrivacyPage />
+                    </React.Suspense>
+                  }
+                />
+                <Route
+                  path="/terms"
+                  element={
+                    <React.Suspense fallback={<PageFallback />}>
+                      <TermsPage />
                     </React.Suspense>
                   }
                 />

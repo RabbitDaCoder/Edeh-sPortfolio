@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Github, Linkedin, Twitter, Mail } from "lucide-react";
 import { PERSONAL } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
@@ -98,18 +99,18 @@ export const Footer: React.FC = () => {
             © {currentYear} {fullName}. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a
-              href="/privacy"
+            <Link
+              to="/privacy"
               className="text-xs text-text-muted hover:text-text-primary transition-colors"
             >
-              Privacy
-            </a>
-            <a
-              href="/terms"
+              Privacy Policy
+            </Link>
+            <Link
+              to="/terms"
               className="text-xs text-text-muted hover:text-text-primary transition-colors"
             >
-              Terms
-            </a>
+              Terms of Service
+            </Link>
           </div>
         </div>
       </div>

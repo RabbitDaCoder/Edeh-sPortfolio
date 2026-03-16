@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiClient } from "../../lib/axios";
-import { Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, Star } from "lucide-react";
 import { ImageUploadField } from "../../components/ImageUploadField";
 
 const bookSchema = z.object({
@@ -19,6 +19,7 @@ const bookSchema = z.object({
   price: z.coerce.number().min(0, "Price must be positive"),
   fileUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   published: z.boolean(),
+  featured: z.boolean(),
 });
 
 type BookForm = z.infer<typeof bookSchema>;
@@ -35,6 +36,11 @@ export function BooksPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`books/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["books"] }),
+  });
+
+  const featureMutation = useMutation({
+    mutationFn: (id: string) => apiClient.patch(`books/${id}/feature`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["books"] }),
   });
 
@@ -103,7 +109,12 @@ export function BooksPage() {
                   className="border-b border-border last:border-0 hover:bg-surface/50 transition-colors"
                 >
                   <td className="p-3 text-text-primary font-medium">
-                    {book.title}
+                    <div className="flex items-center gap-2">
+                      {book.title}
+                      {book.featured && (
+                        <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                      )}
+                    </div>
                   </td>
                   <td className="p-3 text-text-muted hidden md:table-cell">
                     ${Number(book.price).toFixed(2)}
@@ -117,6 +128,21 @@ export function BooksPage() {
                   </td>
                   <td className="p-3 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => featureMutation.mutate(book.id)}
+                        className={`p-1.5 rounded-sm hover:bg-surface transition-colors ${
+                          book.featured
+                            ? "text-yellow-500"
+                            : "text-text-muted hover:text-yellow-500"
+                        }`}
+                        title={
+                          book.featured
+                            ? "Remove from featured"
+                            : "Mark as featured"
+                        }
+                      >
+                        <Star className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => setEditing(book)}
                         className="p-1.5 text-text-muted hover:text-text-primary rounded-sm hover:bg-surface transition-colors"
@@ -191,8 +217,9 @@ function BookFormModal({
           price: Number(book.price),
           coverImage: book.coverImage ?? "",
           fileUrl: book.fileUrl ?? "",
+          featured: book.featured ?? false,
         }
-      : { published: false, price: 0 },
+      : { published: false, featured: false, price: 0 },
   });
 
   const mutation = useMutation({
@@ -273,6 +300,16 @@ function BookFormModal({
               className="w-4 h-4 accent-accent"
             />
             <span className="text-sm font-medium">Published</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              {...register("featured")}
+              className="w-4 h-4 accent-accent"
+            />
+            <span className="text-sm font-medium inline-flex items-center gap-1">
+              <Star className="w-3.5 h-3.5" /> Featured
+            </span>
           </label>
           {mutation.isError && (
             <p className="text-sm text-red-500">Failed to save.</p>

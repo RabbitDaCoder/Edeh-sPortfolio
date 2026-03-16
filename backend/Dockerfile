@@ -37,14 +37,12 @@ COPY --from=builder /app/backend/node_modules ./backend/node_modules
 
 RUN addgroup -g 1001 -S portfolio && \
     adduser -S portfolio -u 1001 -G portfolio && \
-    mkdir -p /tmp/uploads && \
-    chown -R portfolio:portfolio /app /tmp/uploads
+    chown -R portfolio:portfolio /app
 
 USER portfolio
 
 ENV NODE_ENV=production
 ENV PORT=4000
-ENV UPLOAD_TEMP_DIR=/tmp/uploads
 EXPOSE 4000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \

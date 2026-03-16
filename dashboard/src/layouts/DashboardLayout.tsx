@@ -11,6 +11,7 @@ import {
   FolderKanban,
   Cpu,
   MessageSquare,
+  MessageCircle,
   Image,
   Settings,
   Menu,
@@ -43,6 +44,7 @@ const navGroups: NavGroup[] = [
     items: [
       { to: "/blog", icon: FileText, label: "Blog Posts" },
       { to: "/books", icon: BookOpen, label: "Books" },
+      { to: "/comments", icon: MessageCircle, label: "Comments" },
     ],
   },
   {

@@ -7,8 +7,9 @@ export PATH="/app/node_modules/.bin:/app/backend/node_modules/.bin:$PATH"
 echo "==> Running Prisma migrations..."
 prisma migrate deploy --schema=backend/prisma/schema.prisma
 
-echo "==> Running seed script..."
-node backend/dist/seed/backend/prisma/seed.js || echo "Seed script failed (may already be seeded), continuing..."
+# Seed is a MANUAL command only — never run automatically on deploy.
+# Use: npm run db:seed (local) or run seed.js directly in the container.
+# Running seed on every deploy risks overwriting live dashboard data.
 
 echo "==> Starting server..."
 exec node backend/dist/server.js

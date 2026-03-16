@@ -1,41 +1,57 @@
 import React from "react";
-import { Badge } from "../ui/Badge";
+
+interface CategoryGroup {
+  group: string;
+  categories: string[];
+}
 
 interface BlogFiltersProps {
-  categories: string[];
+  categoryGroups: CategoryGroup[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
 }
 
 export const BlogFilters: React.FC<BlogFiltersProps> = ({
-  categories,
+  categoryGroups,
   activeCategory,
   onCategoryChange,
 }) => {
   return (
-    <div className="flex flex-wrap gap-2">
-      <button
-        onClick={() => onCategoryChange("")}
-        className={`px-3 py-1.5 text-xs rounded-sm border transition-colors ${
-          activeCategory === ""
-            ? "bg-accent text-background border-accent"
-            : "border-border text-text-muted hover:text-text-primary hover:border-text-muted/40"
-        }`}
-      >
-        All
-      </button>
-      {categories.map((cat) => (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
         <button
-          key={cat}
-          onClick={() => onCategoryChange(cat)}
+          onClick={() => onCategoryChange("")}
           className={`px-3 py-1.5 text-xs rounded-sm border transition-colors ${
-            activeCategory === cat
+            activeCategory === ""
               ? "bg-accent text-background border-accent"
               : "border-border text-text-muted hover:text-text-primary hover:border-text-muted/40"
           }`}
         >
-          {cat}
+          All
         </button>
+      </div>
+
+      {categoryGroups.map((group) => (
+        <div key={group.group}>
+          <span className="text-[10px] uppercase tracking-[0.15em] text-text-muted/50 font-mono mb-1.5 block">
+            {group.group}
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {group.categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => onCategoryChange(cat)}
+                className={`px-3 py-1.5 text-xs rounded-sm border transition-colors ${
+                  activeCategory === cat
+                    ? "bg-accent text-background border-accent"
+                    : "border-border text-text-muted hover:text-text-primary hover:border-text-muted/40"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );

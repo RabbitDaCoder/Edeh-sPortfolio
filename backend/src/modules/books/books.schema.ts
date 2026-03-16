@@ -8,6 +8,7 @@ export const createBookSchema = z.object({
   price: z.string().transform((v) => parseFloat(v)),
   fileUrl: z.string().url().optional(),
   published: z.boolean().default(false),
+  featured: z.boolean().default(false),
 });
 
 export const updateBookSchema = createBookSchema.partial();

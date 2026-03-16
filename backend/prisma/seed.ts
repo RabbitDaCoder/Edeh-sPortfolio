@@ -56,19 +56,49 @@ function slugify(name: string): string {
 async function main(): Promise<void> {
   console.log("Seeding database...\n");
 
-  // ── 1. Clear seeded tables (reverse FK order) ─────────────────────
-  //    Only tables we seed from portfolio.ts — NOT User, Blog, Article,
-  //    Book, Newsletter, ContactMessage, SiteProfile
-  await prisma.testimonial.deleteMany();
-  await prisma.achievement.deleteMany();
-  await prisma.careerTimeline.deleteMany();
-  await prisma.skill.deleteMany();
-  await prisma.project.deleteMany();
-  await prisma.download.deleteMany();
-  await prisma.polaroid.deleteMany();
-  console.log("✓ Cleared portfolio tables");
+  // ── Count existing rows — only seed tables that are empty ──────────
+  const [
+    projects,
+    skills,
+    careers,
+    testimonials,
+    achievements,
+    downloads,
+    polaroids,
+  ] = await Promise.all([
+    prisma.project.count(),
+    prisma.skill.count(),
+    prisma.careerTimeline.count(),
+    prisma.testimonial.count(),
+    prisma.achievement.count(),
+    prisma.download.count(),
+    prisma.polaroid.count(),
+  ]);
 
-  // ── 2. Projects (from PROJECTS) ────────────────────────────────────
+  const allEmpty =
+    projects === 0 &&
+    skills === 0 &&
+    careers === 0 &&
+    testimonials === 0 &&
+    achievements === 0 &&
+    downloads === 0 &&
+    polaroids === 0;
+
+  if (!allEmpty) {
+    console.log(
+      "Database already has data — skipping seed to preserve dashboard edits.",
+    );
+    console.log(
+      `  projects=${projects} skills=${skills} careers=${careers} ` +
+        `testimonials=${testimonials} achievements=${achievements} ` +
+        `downloads=${downloads} polaroids=${polaroids}`,
+    );
+    return;
+  }
+
+  console.log("Empty database detected — running initial seed...\n");
+
+  // ── 1. Projects (from PROJECTS) ────────────────────────────────────
   for (const p of PROJECTS) {
     await prisma.project.create({
       data: {
@@ -89,7 +119,7 @@ async function main(): Promise<void> {
   }
   console.log(`✓ ${PROJECTS.length} projects seeded`);
 
-  // ── 3. Skills / Technologies (from TECHNOLOGIES) ───────────────────
+  // ── 2. Skills / Technologies (from TECHNOLOGIES) ───────────────────
   let skillOrder = 0;
   for (const t of TECHNOLOGIES) {
     skillOrder++;
@@ -110,7 +140,7 @@ async function main(): Promise<void> {
   }
   console.log(`✓ ${skillOrder} skills seeded`);
 
-  // ── 4. Career Timeline (from EXPERIENCES) ──────────────────────────
+  // ── 3. Career Timeline (from EXPERIENCES) ──────────────────────────
   for (const e of EXPERIENCES) {
     const type = TYPE_MAP[e.type];
     if (!type) {
@@ -135,7 +165,7 @@ async function main(): Promise<void> {
   }
   console.log(`✓ ${EXPERIENCES.length} career entries seeded`);
 
-  // ── 5. Testimonials (from TESTIMONIALS) ────────────────────────────
+  // ── 4. Testimonials (from TESTIMONIALS) ────────────────────────────
   for (const t of TESTIMONIALS) {
     await prisma.testimonial.create({
       data: {
@@ -151,7 +181,7 @@ async function main(): Promise<void> {
   }
   console.log(`✓ ${TESTIMONIALS.length} testimonials seeded`);
 
-  // ── 6. Achievements (from ACHIEVEMENTS) ────────────────────────────
+  // ── 5. Achievements (from ACHIEVEMENTS) ────────────────────────────
   for (const a of ACHIEVEMENTS) {
     await prisma.achievement.create({
       data: {
@@ -164,7 +194,7 @@ async function main(): Promise<void> {
   }
   console.log(`✓ ${ACHIEVEMENTS.length} achievements seeded`);
 
-  // ── 7. Download / CV (from CV) ─────────────────────────────────────
+  // ── 6. Download / CV (from CV) ─────────────────────────────────────
   await prisma.download.create({
     data: {
       label: CV.filename,
@@ -177,7 +207,7 @@ async function main(): Promise<void> {
   });
   console.log("✓ CV download seeded");
 
-  // ── 8. Polaroids (from POLAROIDS) ──────────────────────────────────
+  // ── 7. Polaroids (from POLAROIDS) ──────────────────────────────────
   for (const p of POLAROIDS) {
     await prisma.polaroid.create({
       data: {
