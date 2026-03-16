@@ -3,6 +3,9 @@ import { cacheService } from "../../services/cache.service";
 import { CreateSkillInput, UpdateSkillInput } from "./skills.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class SkillService {
   async getSkills() {
@@ -11,13 +14,13 @@ export class SkillService {
     if (cached) return cached;
 
     const skills = await skillRepository.findAll();
-    await cacheService.set(cacheKey, skills, 600);
+    await cacheService.set(cacheKey, skills, CACHE_TTL);
     return skills;
   }
 
   async createSkill(data: CreateSkillInput) {
     const skill = await skillRepository.create(data);
-    await cacheService.del("skills:all");
+    await this.refreshCache();
     return skill;
   }
 
@@ -26,7 +29,7 @@ export class SkillService {
     if (!skill) throw new AppError(ErrorCode.SKILL_NOT_FOUND);
 
     const updated = await skillRepository.update(id, data);
-    await cacheService.del("skills:all");
+    await this.refreshCache();
     return updated;
   }
 
@@ -35,7 +38,17 @@ export class SkillService {
     if (!skill) throw new AppError(ErrorCode.SKILL_NOT_FOUND);
 
     await skillRepository.delete(id);
-    await cacheService.del("skills:all");
+    await this.refreshCache();
+  }
+
+  private async refreshCache() {
+    try {
+      await cacheService.del("skills:all");
+      const skills = await skillRepository.findAll();
+      await cacheService.set("skills:all", skills, CACHE_TTL);
+    } catch (err) {
+      logger.error({ err }, "Failed to refresh skills cache");
+    }
   }
 }
 

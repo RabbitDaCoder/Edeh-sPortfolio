@@ -5,6 +5,8 @@ import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
 import { logger } from "../../utils/logger";
 
+const CACHE_TTL = 120;
+
 export class ArticleService {
   async getArticles(page: number, limit: number, published?: boolean) {
     const cacheKey = `articles:page:${page}:limit:${limit}${published !== undefined ? `:published:${published}` : ""}`;
@@ -17,7 +19,7 @@ export class ArticleService {
       published,
     );
     const response = { articles, total };
-    await cacheService.set(cacheKey, response, 300);
+    await cacheService.set(cacheKey, response, CACHE_TTL);
     return response;
   }
 
@@ -29,13 +31,13 @@ export class ArticleService {
     const article = await articleRepository.findBySlug(slug);
     if (!article) throw new AppError(ErrorCode.ARTICLE_NOT_FOUND);
 
-    await cacheService.set(cacheKey, article, 600);
+    await cacheService.set(cacheKey, article, CACHE_TTL);
     return article;
   }
 
   async createArticle(data: CreateArticleInput) {
     const article = await articleRepository.create(data);
-    await cacheService.invalidatePattern("articles:page:*");
+    await this.invalidateCache();
     return article;
   }
 
@@ -44,8 +46,7 @@ export class ArticleService {
     if (!article) throw new AppError(ErrorCode.ARTICLE_NOT_FOUND);
 
     const updated = await articleRepository.update(id, data);
-    await cacheService.del(`article:slug:${article.slug}`);
-    await cacheService.invalidatePattern("articles:page:*");
+    await this.invalidateCache(`article:slug:${article.slug}`);
     return updated;
   }
 
@@ -54,8 +55,16 @@ export class ArticleService {
     if (!article) throw new AppError(ErrorCode.ARTICLE_NOT_FOUND);
 
     await articleRepository.delete(id);
-    await cacheService.del(`article:slug:${article.slug}`);
-    await cacheService.invalidatePattern("articles:page:*");
+    await this.invalidateCache(`article:slug:${article.slug}`);
+  }
+
+  private async invalidateCache(slugKey?: string) {
+    try {
+      if (slugKey) await cacheService.del(slugKey);
+      await cacheService.invalidatePattern("articles:page:*");
+    } catch (err) {
+      logger.error({ err }, "Failed to invalidate articles cache");
+    }
   }
 }
 

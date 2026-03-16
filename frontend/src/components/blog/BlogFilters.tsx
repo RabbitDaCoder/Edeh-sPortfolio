@@ -1,12 +1,12 @@
 import React from "react";
 
 interface CategoryGroup {
-  group: string;
-  categories: string[];
+  readonly label: string;
+  readonly categories: readonly string[];
 }
 
 interface BlogFiltersProps {
-  categoryGroups: CategoryGroup[];
+  categoryGroups: readonly CategoryGroup[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
 }
@@ -32,9 +32,9 @@ export const BlogFilters: React.FC<BlogFiltersProps> = ({
       </div>
 
       {categoryGroups.map((group) => (
-        <div key={group.group}>
+        <div key={group.label}>
           <span className="text-[10px] uppercase tracking-[0.15em] text-text-muted/50 font-mono mb-1.5 block">
-            {group.group}
+            {group.label}
           </span>
           <div className="flex flex-wrap gap-1.5">
             {group.categories.map((cat) => (

@@ -6,6 +6,9 @@ import {
 } from "./testimonials.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class TestimonialService {
   async getTestimonials(published?: boolean) {
@@ -14,13 +17,13 @@ export class TestimonialService {
     if (cached) return cached;
 
     const testimonials = await testimonialRepository.findAll(published);
-    await cacheService.set(cacheKey, testimonials, 600);
+    await cacheService.set(cacheKey, testimonials, CACHE_TTL);
     return testimonials;
   }
 
   async createTestimonial(data: CreateTestimonialInput) {
     const testimonial = await testimonialRepository.create(data);
-    await cacheService.invalidatePattern("testimonials:*");
+    await this.refreshCache();
     return testimonial;
   }
 
@@ -29,7 +32,7 @@ export class TestimonialService {
     if (!testimonial) throw new AppError(ErrorCode.TESTIMONIAL_NOT_FOUND);
 
     const updated = await testimonialRepository.update(id, data);
-    await cacheService.invalidatePattern("testimonials:*");
+    await this.refreshCache();
     return updated;
   }
 
@@ -38,7 +41,17 @@ export class TestimonialService {
     if (!testimonial) throw new AppError(ErrorCode.TESTIMONIAL_NOT_FOUND);
 
     await testimonialRepository.delete(id);
-    await cacheService.invalidatePattern("testimonials:*");
+    await this.refreshCache();
+  }
+
+  private async refreshCache() {
+    try {
+      await cacheService.invalidatePattern("testimonials:*");
+      const testimonials = await testimonialRepository.findAll();
+      await cacheService.set("testimonials:all", testimonials, CACHE_TTL);
+    } catch (err) {
+      logger.error({ err }, "Failed to refresh testimonials cache");
+    }
   }
 }
 

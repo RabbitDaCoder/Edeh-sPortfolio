@@ -4,6 +4,9 @@ import { cloudinaryService } from "../../services/cloudinary.service";
 import { CreateDownloadInput, UpdateDownloadInput } from "./downloads.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class DownloadService {
   async getDownloads() {
@@ -12,7 +15,7 @@ export class DownloadService {
     if (cached) return cached;
 
     const downloads = await downloadRepository.findAll();
-    await cacheService.set(cacheKey, downloads, 600);
+    await cacheService.set(cacheKey, downloads, CACHE_TTL);
     return downloads;
   }
 
@@ -45,7 +48,7 @@ export class DownloadService {
       fileUrl,
       publicId,
     });
-    await cacheService.del("downloads:all");
+    await this.refreshCache();
     return download;
   }
 
@@ -79,7 +82,7 @@ export class DownloadService {
       ...(fileUrl ? { fileUrl } : {}),
       ...(publicId !== download.publicId ? { publicId } : {}),
     });
-    await cacheService.del("downloads:all");
+    await this.refreshCache();
     return updated;
   }
 
@@ -92,7 +95,7 @@ export class DownloadService {
     }
 
     await downloadRepository.delete(id);
-    await cacheService.del("downloads:all");
+    await this.refreshCache();
   }
 
   async recordDownload(id: string) {
@@ -100,6 +103,16 @@ export class DownloadService {
     if (!download) throw new AppError(ErrorCode.DOWNLOAD_NOT_FOUND);
 
     await downloadRepository.incrementDownloads(id);
+  }
+
+  private async refreshCache() {
+    try {
+      await cacheService.del("downloads:all");
+      const downloads = await downloadRepository.findAll();
+      await cacheService.set("downloads:all", downloads, CACHE_TTL);
+    } catch (err) {
+      logger.error({ err }, "Failed to refresh downloads cache");
+    }
   }
 }
 

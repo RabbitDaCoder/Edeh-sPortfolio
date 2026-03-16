@@ -38,6 +38,10 @@ export const Navigation: React.FC = () => {
         navigate("/books");
         return;
       }
+      if (link.id === "guestbook") {
+        navigate("/guestbook");
+        return;
+      }
 
       const anchor = link.id;
       if (isHome) {

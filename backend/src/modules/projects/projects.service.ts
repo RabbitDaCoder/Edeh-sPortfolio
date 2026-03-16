@@ -3,6 +3,9 @@ import { cacheService } from "../../services/cache.service";
 import { CreateProjectInput, UpdateProjectInput } from "./projects.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class ProjectService {
   async getProjects(published?: boolean) {
@@ -11,7 +14,7 @@ export class ProjectService {
     if (cached) return cached;
 
     const projects = await projectRepository.findAll(published);
-    await cacheService.set(cacheKey, projects, 600);
+    await cacheService.set(cacheKey, projects, CACHE_TTL);
     return projects;
   }
 
@@ -23,7 +26,7 @@ export class ProjectService {
 
   async createProject(data: CreateProjectInput) {
     const project = await projectRepository.create(data);
-    await cacheService.invalidatePattern("projects:*");
+    await this.refreshCache();
     return project;
   }
 
@@ -32,7 +35,7 @@ export class ProjectService {
     if (!project) throw new AppError(ErrorCode.PROJECT_NOT_FOUND);
 
     const updated = await projectRepository.update(id, data);
-    await cacheService.invalidatePattern("projects:*");
+    await this.refreshCache();
     return updated;
   }
 
@@ -41,7 +44,18 @@ export class ProjectService {
     if (!project) throw new AppError(ErrorCode.PROJECT_NOT_FOUND);
 
     await projectRepository.delete(id);
-    await cacheService.invalidatePattern("projects:*");
+    await this.refreshCache();
+  }
+
+  /** Invalidate all project cache keys and re-populate with fresh data */
+  private async refreshCache() {
+    try {
+      await cacheService.invalidatePattern("projects:*");
+      const projects = await projectRepository.findAll();
+      await cacheService.set("projects:all", projects, CACHE_TTL);
+    } catch (err) {
+      logger.error({ err }, "Failed to refresh projects cache");
+    }
   }
 }
 

@@ -57,6 +57,14 @@ const ContactPage = React.lazy(() =>
 const ProjectsPage = React.lazy(() =>
   import("./pages/Projects").then((m) => ({ default: m.ProjectsPage })),
 );
+const GuestbookPage = React.lazy(() =>
+  import("./pages/Guestbook").then((m) => ({ default: m.GuestbookPage })),
+);
+const GuestbookCreatePage = React.lazy(() =>
+  import("./pages/GuestbookCreate").then((m) => ({
+    default: m.GuestbookCreatePage,
+  })),
+);
 const PrivacyPage = React.lazy(() => import("./pages/legal/PrivacyPage"));
 const TermsPage = React.lazy(() => import("./pages/legal/TermsPage"));
 
@@ -188,6 +196,28 @@ export function App() {
                     <React.Suspense fallback={<PageFallback />}>
                       <ErrorBoundary>
                         <ProjectsPage />
+                      </ErrorBoundary>
+                    </React.Suspense>
+                  }
+                />
+
+                {/* Guestbook Route */}
+                <Route
+                  path="/guestbook"
+                  element={
+                    <React.Suspense fallback={<PageFallback />}>
+                      <ErrorBoundary>
+                        <GuestbookPage />
+                      </ErrorBoundary>
+                    </React.Suspense>
+                  }
+                />
+                <Route
+                  path="/guestbook/create"
+                  element={
+                    <React.Suspense fallback={<PageFallback />}>
+                      <ErrorBoundary>
+                        <GuestbookCreatePage />
                       </ErrorBoundary>
                     </React.Suspense>
                   }

@@ -1,7 +1,7 @@
 const OWNER_HANDLES = {
   twitter: "@EdehChinedu20",
-  instagram: "@chinedu_edeh",
-  facebook: "Edeh Chinedu Daniel",
+  instagram: "@edehchinedu20",
+  facebook: "daniels.christian.77",
 } as const;
 
 const SITE_URL = import.meta.env.VITE_SITE_URL || "https://edehchinedu.com";

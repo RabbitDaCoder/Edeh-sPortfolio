@@ -3,6 +3,9 @@ import { cacheService } from "../../services/cache.service";
 import { CreateBookInput, UpdateBookInput } from "./books.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class BookService {
   async getBooks(page: number, limit: number, published?: boolean) {
@@ -16,7 +19,7 @@ export class BookService {
       published,
     );
     const response = { books, total };
-    await cacheService.set(cacheKey, response, 300);
+    await cacheService.set(cacheKey, response, CACHE_TTL);
     return response;
   }
 
@@ -26,7 +29,7 @@ export class BookService {
     if (cached) return cached;
 
     const books = await bookRepository.findFeatured(limit);
-    await cacheService.set(cacheKey, books, 300);
+    await cacheService.set(cacheKey, books, CACHE_TTL);
     return books;
   }
 
@@ -38,13 +41,13 @@ export class BookService {
     const book = await bookRepository.findBySlug(slug);
     if (!book) throw new AppError(ErrorCode.BOOK_NOT_FOUND);
 
-    await cacheService.set(cacheKey, book, 600);
+    await cacheService.set(cacheKey, book, CACHE_TTL);
     return book;
   }
 
   async createBook(data: CreateBookInput) {
     const book = await bookRepository.create(data);
-    await cacheService.invalidatePattern("books:*");
+    await this.invalidateCache();
     return book;
   }
 
@@ -53,8 +56,7 @@ export class BookService {
     if (!book) throw new AppError(ErrorCode.BOOK_NOT_FOUND);
 
     const updated = await bookRepository.update(id, data);
-    await cacheService.del(`book:slug:${book.slug}`);
-    await cacheService.invalidatePattern("books:*");
+    await this.invalidateCache(`book:slug:${book.slug}`);
     return updated;
   }
 
@@ -63,8 +65,7 @@ export class BookService {
     if (!book) throw new AppError(ErrorCode.BOOK_NOT_FOUND);
 
     await bookRepository.delete(id);
-    await cacheService.del(`book:slug:${book.slug}`);
-    await cacheService.invalidatePattern("books:*");
+    await this.invalidateCache(`book:slug:${book.slug}`);
   }
 
   async toggleFeatured(id: string) {
@@ -74,9 +75,17 @@ export class BookService {
     const updated = await bookRepository.update(id, {
       featured: !book.featured,
     });
-    await cacheService.del(`book:slug:${book.slug}`);
-    await cacheService.invalidatePattern("books:*");
+    await this.invalidateCache(`book:slug:${book.slug}`);
     return updated;
+  }
+
+  private async invalidateCache(slugKey?: string) {
+    try {
+      if (slugKey) await cacheService.del(slugKey);
+      await cacheService.invalidatePattern("books:*");
+    } catch (err) {
+      logger.error({ err }, "Failed to invalidate books cache");
+    }
   }
 }
 

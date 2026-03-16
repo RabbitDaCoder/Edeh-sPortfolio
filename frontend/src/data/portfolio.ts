@@ -38,8 +38,7 @@ export const NAV_LINKS = [
   { id: "achievements", label: "Achievements" },
   { id: "blog", label: "Writing" },
   { id: "books", label: "Books" },
-  { id: "call", label: "Call" },
-  { id: "cv", label: "CV" },
+  { id: "guestbook", label: "Guestbook" },
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────

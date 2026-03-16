@@ -14,6 +14,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 }) => {
   return (
     <div data-color-mode="dark">
+      {/* @ts-expect-error — MDEditor types expect a newer @types/react that includes bigint in ReactNode */}
       <MDEditor
         value={value}
         onChange={(val) => onChange(val ?? "")}

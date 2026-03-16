@@ -5,6 +5,8 @@ import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
 import { logger } from "../../utils/logger";
 
+const CACHE_TTL = 120;
+
 export class BlogService {
   async getBlogs(
     page: number,
@@ -30,7 +32,7 @@ export class BlogService {
     );
 
     const response = { blogs, total };
-    await cacheService.set(cacheKey, response, 300);
+    await cacheService.set(cacheKey, response, CACHE_TTL);
 
     return response;
   }
@@ -45,7 +47,7 @@ export class BlogService {
     }
 
     const blogs = await blogRepository.findFeatured(limit);
-    await cacheService.set(cacheKey, blogs, 300);
+    await cacheService.set(cacheKey, blogs, CACHE_TTL);
     return blogs;
   }
 
@@ -63,7 +65,7 @@ export class BlogService {
       throw new AppError(ErrorCode.BLOG_NOT_FOUND);
     }
 
-    await cacheService.set(cacheKey, blog, 600);
+    await cacheService.set(cacheKey, blog, CACHE_TTL);
 
     cacheService.increment(`blog:views:${blog.id}`, 300).catch((err) => {
       logger.error({ err }, "Failed to increment blog views");
@@ -74,7 +76,7 @@ export class BlogService {
 
   async createBlog(data: CreateBlogInput) {
     const blog = await blogRepository.create(data);
-    await cacheService.invalidatePattern("blogs:*");
+    await this.invalidateCache();
     return blog;
   }
 
@@ -85,8 +87,7 @@ export class BlogService {
     }
 
     const updated = await blogRepository.update(id, data);
-    await cacheService.del(`blog:slug:${blog.slug}`);
-    await cacheService.invalidatePattern("blogs:*");
+    await this.invalidateCache(`blog:slug:${blog.slug}`);
 
     return updated;
   }
@@ -98,8 +99,7 @@ export class BlogService {
     }
 
     await blogRepository.delete(id);
-    await cacheService.del(`blog:slug:${blog.slug}`);
-    await cacheService.invalidatePattern("blogs:*");
+    await this.invalidateCache(`blog:slug:${blog.slug}`);
   }
 
   async toggleFeatured(id: string) {
@@ -111,8 +111,7 @@ export class BlogService {
     const updated = await blogRepository.update(id, {
       featured: !blog.featured,
     });
-    await cacheService.del(`blog:slug:${blog.slug}`);
-    await cacheService.invalidatePattern("blogs:*");
+    await this.invalidateCache(`blog:slug:${blog.slug}`);
     return updated;
   }
 
@@ -122,6 +121,15 @@ export class BlogService {
       throw new AppError(ErrorCode.BLOG_NOT_FOUND);
     }
     return blogRepository.findNextPost(slug, current.createdAt);
+  }
+
+  private async invalidateCache(slugKey?: string) {
+    try {
+      if (slugKey) await cacheService.del(slugKey);
+      await cacheService.invalidatePattern("blogs:*");
+    } catch (err) {
+      logger.error({ err }, "Failed to invalidate blog cache");
+    }
   }
 }
 

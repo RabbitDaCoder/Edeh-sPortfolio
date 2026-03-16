@@ -22,10 +22,33 @@ export class CacheService {
     await redis.del(key);
   }
 
+  /**
+   * SCAN-based pattern deletion — non-blocking, cursor-based iteration.
+   * Collects all matching keys first, then deletes in a single pipeline
+   * for atomicity (no window between finding and deleting keys).
+   */
   async invalidatePattern(pattern: string): Promise<void> {
-    const keys = await redis.keys(pattern);
-    if (keys.length > 0) {
-      await redis.del(...keys);
+    const keysToDelete: string[] = [];
+    let cursor = "0";
+
+    do {
+      const [nextCursor, keys] = await redis.scan(
+        cursor,
+        "MATCH",
+        pattern,
+        "COUNT",
+        200,
+      );
+      cursor = nextCursor;
+      keysToDelete.push(...keys);
+    } while (cursor !== "0");
+
+    if (keysToDelete.length > 0) {
+      const pipeline = redis.pipeline();
+      for (const key of keysToDelete) {
+        pipeline.del(key);
+      }
+      await pipeline.exec();
     }
   }
 

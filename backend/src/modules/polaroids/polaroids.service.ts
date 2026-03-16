@@ -3,6 +3,9 @@ import { cacheService } from "../../services/cache.service";
 import { CreatePolaroidInput, UpdatePolaroidInput } from "./polaroids.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class PolaroidService {
   async getPolaroids(published?: boolean) {
@@ -11,7 +14,7 @@ export class PolaroidService {
     if (cached) return cached;
 
     const polaroids = await polaroidRepository.findAll(published);
-    await cacheService.set(cacheKey, polaroids, 600);
+    await cacheService.set(cacheKey, polaroids, CACHE_TTL);
     return polaroids;
   }
 
@@ -23,7 +26,7 @@ export class PolaroidService {
 
   async createPolaroid(data: CreatePolaroidInput) {
     const polaroid = await polaroidRepository.create(data);
-    await cacheService.invalidatePattern("polaroids:*");
+    await this.refreshCache();
     return polaroid;
   }
 
@@ -32,7 +35,7 @@ export class PolaroidService {
     if (!polaroid) throw new AppError(ErrorCode.POLAROID_NOT_FOUND);
 
     const updated = await polaroidRepository.update(id, data);
-    await cacheService.invalidatePattern("polaroids:*");
+    await this.refreshCache();
     return updated;
   }
 
@@ -41,7 +44,17 @@ export class PolaroidService {
     if (!polaroid) throw new AppError(ErrorCode.POLAROID_NOT_FOUND);
 
     await polaroidRepository.delete(id);
-    await cacheService.invalidatePattern("polaroids:*");
+    await this.refreshCache();
+  }
+
+  private async refreshCache() {
+    try {
+      await cacheService.invalidatePattern("polaroids:*");
+      const polaroids = await polaroidRepository.findAll();
+      await cacheService.set("polaroids:all", polaroids, CACHE_TTL);
+    } catch (err) {
+      logger.error({ err }, "Failed to refresh polaroids cache");
+    }
   }
 }
 

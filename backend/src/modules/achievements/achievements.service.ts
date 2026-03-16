@@ -6,6 +6,9 @@ import {
 } from "./achievements.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
+import { logger } from "../../utils/logger";
+
+const CACHE_TTL = 120;
 
 export class AchievementService {
   async getAchievements() {
@@ -14,13 +17,13 @@ export class AchievementService {
     if (cached) return cached;
 
     const achievements = await achievementRepository.findAll();
-    await cacheService.set(cacheKey, achievements, 600);
+    await cacheService.set(cacheKey, achievements, CACHE_TTL);
     return achievements;
   }
 
   async createAchievement(data: CreateAchievementInput) {
     const achievement = await achievementRepository.create(data);
-    await cacheService.del("achievements:all");
+    await this.refreshCache();
     return achievement;
   }
 
@@ -29,7 +32,7 @@ export class AchievementService {
     if (!achievement) throw new AppError(ErrorCode.ACHIEVEMENT_NOT_FOUND);
 
     const updated = await achievementRepository.update(id, data);
-    await cacheService.del("achievements:all");
+    await this.refreshCache();
     return updated;
   }
 
@@ -38,7 +41,17 @@ export class AchievementService {
     if (!achievement) throw new AppError(ErrorCode.ACHIEVEMENT_NOT_FOUND);
 
     await achievementRepository.delete(id);
-    await cacheService.del("achievements:all");
+    await this.refreshCache();
+  }
+
+  private async refreshCache() {
+    try {
+      await cacheService.del("achievements:all");
+      const achievements = await achievementRepository.findAll();
+      await cacheService.set("achievements:all", achievements, CACHE_TTL);
+    } catch (err) {
+      logger.error({ err }, "Failed to refresh achievements cache");
+    }
   }
 }
 

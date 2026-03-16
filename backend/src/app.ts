@@ -10,6 +10,7 @@ import { logger } from "./utils/logger";
 import { swaggerSpec } from "./docs/swagger";
 import { db } from "./config/db";
 import v1Routes from "./routes/v1";
+import v2Routes from "./routes/v2";
 
 export function createApp(): Express {
   const app = express();
@@ -52,6 +53,7 @@ export function createApp(): Express {
         { loc: "/blog", priority: "0.9", changefreq: "daily" },
         { loc: "/books", priority: "0.8", changefreq: "weekly" },
         { loc: "/contact", priority: "0.6", changefreq: "monthly" },
+        { loc: "/guestbook", priority: "0.6", changefreq: "daily" },
       ];
 
       const urls = staticPages
@@ -84,6 +86,7 @@ export function createApp(): Express {
   });
 
   app.use("/api/v1", v1Routes);
+  app.use("/api/v2", v2Routes);
 
   app.use((req: Request, res: Response) => {
     res.status(404).json({

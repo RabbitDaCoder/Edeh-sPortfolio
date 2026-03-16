@@ -258,3 +258,23 @@ model Comment {
   @@index([approved])
   @@index([email])
 }
+
+model GuestbookEntry {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String   @db.VarChar(280)
+  handle    String?  @db.VarChar(80)
+  approved  Boolean  @default(false)
+  pinned    Boolean  @default(false)
+  flagged   Boolean  @default(false)
+  ipAddress String?
+  userAgent String?
+  country   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([approved])
+  @@index([pinned])
+  @@index([createdAt])
+}

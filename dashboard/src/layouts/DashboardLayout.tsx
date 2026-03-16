@@ -12,6 +12,7 @@ import {
   Cpu,
   MessageSquare,
   MessageCircle,
+  BookMarked,
   Image,
   Settings,
   Menu,
@@ -45,6 +46,7 @@ const navGroups: NavGroup[] = [
       { to: "/blog", icon: FileText, label: "Blog Posts" },
       { to: "/books", icon: BookOpen, label: "Books" },
       { to: "/comments", icon: MessageCircle, label: "Comments" },
+      { to: "/guestbook", icon: BookMarked, label: "Guestbook" },
     ],
   },
   {
