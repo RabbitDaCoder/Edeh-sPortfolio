@@ -1,32 +1,61 @@
 import { db } from "../../config/db";
 
 export class GuestbookRepository {
-  async findAll(params: { page?: number; limit?: number } = {}) {
-    const limit = params.limit ?? 50;
-    const skip = ((params.page ?? 1) - 1) * limit;
+  private readonly entrySelect = {
+    id: true,
+    name: true,
+    handle: true,
+    message: true,
+    pinned: true,
+    country: true,
+    createdAt: true,
+  } as const;
 
-    const [entries, total] = await Promise.all([
+  async findFirstEver() {
+    return db.guestbookEntry.findFirst({
+      where: { approved: true, flagged: false },
+      orderBy: { createdAt: "asc" },
+      select: this.entrySelect,
+    });
+  }
+
+  async findAll(params: { page?: number; limit?: number } = {}) {
+    const page = params.page ?? 1;
+    const limit = params.limit ?? 50;
+    const skip = (page - 1) * limit;
+
+    const [firstEver, entries, total] = await Promise.all([
+      this.findFirstEver(),
       db.guestbookEntry.findMany({
         where: { approved: true, flagged: false },
         orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
         take: limit,
         skip,
-        select: {
-          id: true,
-          name: true,
-          handle: true,
-          message: true,
-          pinned: true,
-          country: true,
-          createdAt: true,
-        },
+        select: this.entrySelect,
       }),
       db.guestbookEntry.count({
         where: { approved: true, flagged: false },
       }),
     ]);
 
-    return { entries, total };
+    const firstId = firstEver?.id;
+
+    // On page 1, remove the first-ever entry from its natural position
+    // and prepend it so it always appears at index 0
+    if (page === 1 && firstId) {
+      const filtered = entries.filter((e) => e.id !== firstId);
+      const tagged = [
+        { ...firstEver, isFirstPost: true },
+        ...filtered.map((e) => ({ ...e, isFirstPost: false })),
+      ];
+      return { entries: tagged, total };
+    }
+
+    // On later pages, just exclude the first-ever entry (already shown on p1)
+    const tagged = entries
+      .filter((e) => e.id !== firstId)
+      .map((e) => ({ ...e, isFirstPost: false }));
+    return { entries: tagged, total };
   }
 
   async create(data: {
@@ -39,7 +68,7 @@ export class GuestbookRepository {
     country?: string;
   }) {
     return db.guestbookEntry.create({
-      data: { ...data, approved: false },
+      data: { ...data, approved: true },
       select: {
         id: true,
         name: true,

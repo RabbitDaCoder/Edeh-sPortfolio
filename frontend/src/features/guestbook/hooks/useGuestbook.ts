@@ -13,6 +13,7 @@ export interface GuestbookEntry {
   pinned: boolean;
   country?: string | null;
   createdAt: string;
+  isFirstPost?: boolean;
 }
 
 interface GuestbookPage {

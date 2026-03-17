@@ -56,6 +56,7 @@ export class CommentRepository {
         website: data.website || null,
         body: data.body,
         parentId: data.parentId || null,
+        approved: true,
         ipAddress: ipAddress || null,
         userAgent: userAgent || null,
       },

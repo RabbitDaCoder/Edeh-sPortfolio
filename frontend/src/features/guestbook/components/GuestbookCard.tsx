@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Pin } from "lucide-react";
+import { Pin, Star } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import type { GuestbookEntry } from "../hooks/useGuestbook";
 
@@ -31,7 +31,20 @@ export const GuestbookCard: React.FC<GuestbookCardProps> = ({
       transition={{ duration: 0.3, delay: (index % 10) * 0.04 }}
       className={`group relative break-inside-avoid mb-4 rounded-lg border p-4 transition-shadow hover:shadow-md ${style}`}
     >
-      {entry.pinned && (
+      {entry.isFirstPost && (
+        <div className="flex items-center gap-1.5 mb-2">
+          <Star
+            size={14}
+            strokeWidth={1.5}
+            className="text-amber-500 fill-amber-500"
+          />
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-500">
+            First Post
+          </span>
+        </div>
+      )}
+
+      {entry.pinned && !entry.isFirstPost && (
         <Pin
           size={14}
           strokeWidth={1.5}
