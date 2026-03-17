@@ -4,6 +4,7 @@ import { idempotencyMiddleware } from "../../middleware/idempotency";
 import { upload } from "../../middleware/upload";
 import {
   getDownloads,
+  getActiveResume,
   createDownload,
   updateDownload,
   deleteDownload,
@@ -14,6 +15,7 @@ import {
 const router = Router();
 
 router.get("/", getDownloads);
+router.get("/resume", getActiveResume);
 router.get("/:id/file", serveDownload);
 router.post("/:id/record", recordDownload);
 router.post(

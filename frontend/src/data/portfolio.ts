@@ -1007,7 +1007,7 @@ export const CV = {
   label: "Curriculum Vitae",
   version: "v3.0",
   lastUpdated: "March 2026",
-  filename: "Edeh-Chinedu-Daniel-CV.pdf",
+  filename: "Edehs-Resume.pdf",
 } as const;
 
 // ─────────────────────────────────────────────────────

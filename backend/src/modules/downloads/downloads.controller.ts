@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { downloadService } from "./downloads.service";
 import { success } from "../../utils/apiResponse";
 import { createDownloadSchema, updateDownloadSchema } from "./downloads.schema";
+import { cloudinary } from "../../config/cloudinary";
+import axios from "axios";
 
 export async function getDownloads(
   req: Request,
@@ -11,6 +13,26 @@ export async function getDownloads(
   try {
     const downloads = await downloadService.getDownloads();
     success(res, downloads);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getActiveResume(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const downloads = await downloadService.getDownloads();
+    const resume = downloads.find((d: any) => d.active);
+    if (!resume) {
+      res.status(404).json({ error: "No active resume found" });
+      return;
+    }
+    // Delegate to serveDownload by setting the id param
+    req.params.id = resume.id;
+    await serveDownload(req, res, next);
   } catch (err) {
     next(err);
   }
@@ -109,27 +131,56 @@ export async function serveDownload(
       .recordDownload(id)
       .catch((err) => console.error("Failed to record download:", err));
 
-    // For Cloudinary raw files, add fl_attachment to force browser download.
-    // Raw URLs use /raw/upload/ — fl_attachment goes in the path as a "transformation".
-    let downloadUrl = download.fileUrl;
     const filename = download.label || "download.pdf";
     const safeFilename = filename.endsWith(".pdf")
       ? filename
       : `${filename}.pdf`;
 
-    if (downloadUrl.includes("cloudinary.com")) {
-      const encodedName = encodeURIComponent(safeFilename);
-      // For raw uploads: /raw/upload/v123/... → /raw/upload/fl_attachment:name/v123/...
-      // For image uploads: /image/upload/v123/... → /image/upload/fl_attachment:name/v123/...
-      downloadUrl = downloadUrl.replace(
-        /\/(raw|image|video)\/upload\//,
-        `/$1/upload/fl_attachment:${encodedName}/`,
-      );
+    // For Cloudinary resources, generate a signed URL to bypass access restrictions,
+    // then proxy the file through the backend so the browser always gets the file.
+    if (download.fileUrl.includes("cloudinary.com") && download.publicId) {
+      const signedUrl = cloudinary.url(download.publicId, {
+        resource_type: "raw",
+        sign_url: true,
+        type: "authenticated",
+        secure: true,
+      });
+
+      // Try signed URL first, fall back to the stored URL
+      const urls = [signedUrl, download.fileUrl];
+
+      for (const url of urls) {
+        try {
+          const upstream = await axios.get(url, {
+            responseType: "stream",
+            timeout: 15000,
+          });
+
+          res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${encodeURIComponent(safeFilename)}"`,
+          );
+          res.setHeader(
+            "Content-Type",
+            upstream.headers["content-type"] || "application/octet-stream",
+          );
+          if (upstream.headers["content-length"]) {
+            res.setHeader("Content-Length", upstream.headers["content-length"]);
+          }
+
+          upstream.data.pipe(res);
+          return;
+        } catch {
+          // Try next URL
+        }
+      }
+
+      res.status(502).json({ error: "Failed to fetch file from storage" });
+      return;
     }
 
-    // Redirect the client to Cloudinary — the browser will download the file
-    // because fl_attachment sets Content-Disposition: attachment on Cloudinary's response.
-    res.redirect(downloadUrl);
+    // Non-Cloudinary URLs: redirect directly
+    res.redirect(download.fileUrl);
   } catch (err) {
     next(err);
   }
