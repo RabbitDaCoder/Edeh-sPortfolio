@@ -153,6 +153,7 @@ export async function serveDownload(
           sign_url: true,
           type: "upload",
           secure: true,
+          version: resource.version,
         });
 
         logger.info(

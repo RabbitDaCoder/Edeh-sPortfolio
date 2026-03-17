@@ -27,11 +27,7 @@ export const CvDownloadSection: React.FC = () => {
           </p>
         </div>
 
-        <a
-          href={`${API_URL}/downloads/resume`}
-          download={CV.filename}
-          rel="noopener noreferrer"
-        >
+        <a href="/Resume.pdf" download={CV.filename} rel="noopener noreferrer">
           <Button variant="primary" size="lg" magnetic className="inline-flex">
             <Download className="w-4 h-4 mr-2" />
             Download {CV.label}

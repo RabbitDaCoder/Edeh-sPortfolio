@@ -16,6 +16,8 @@ export class CloudinaryService {
           folder: options.folder,
           resource_type: options.resourceType ?? "auto",
           public_id: options.publicId,
+          type: "upload",
+          access_mode: "public",
           use_filename: true,
           unique_filename: true,
         },
