@@ -155,7 +155,10 @@ export async function serveDownload(
           secure: true,
         });
 
-        logger.info({ signedUrl, publicId: resource.public_id }, "Proxying download via signed URL");
+        logger.info(
+          { signedUrl, publicId: resource.public_id },
+          "Proxying download via signed URL",
+        );
 
         const upstream = await axios.get(signedUrl, {
           responseType: "stream",
