@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { memo, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Points, PointMaterial } from "@react-three/drei";
 import * as random from "maath/random";
@@ -10,19 +10,22 @@ import * as THREE from "three";
  * Layer 2 — Mid stars (medium, moderate)
  * Layer 3 — Near stars (larger, fastest, twinkle)
  */
-export function StarField() {
+export const StarField = memo(function StarField() {
   const farRef = useRef<THREE.Points>(null);
   const midRef = useRef<THREE.Points>(null);
   const nearRef = useRef<THREE.Points>(null);
 
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const isLowEnd =
-    typeof navigator !== "undefined" && navigator.hardwareConcurrency <= 4;
-  const reduce = isMobile || isLowEnd;
-
-  const farCount = reduce ? 800 : 3000;
-  const midCount = reduce ? 200 : 800;
-  const nearCount = reduce ? 60 : 200;
+  const { farCount, midCount, nearCount } = useMemo(() => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const isLowEnd =
+      typeof navigator !== "undefined" && navigator.hardwareConcurrency <= 4;
+    const reduce = isMobile || isLowEnd;
+    return {
+      farCount: reduce ? 800 : 3000,
+      midCount: reduce ? 200 : 800,
+      nearCount: reduce ? 60 : 200,
+    };
+  }, []);
 
   const farPositions = useMemo(
     () =>
@@ -123,4 +126,4 @@ export function StarField() {
       </Points>
     </>
   );
-}
+});

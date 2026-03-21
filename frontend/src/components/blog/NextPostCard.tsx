@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -17,7 +18,9 @@ interface NextPostCardProps {
   post: NextPost;
 }
 
-export function NextPostCard({ post }: NextPostCardProps) {
+export const NextPostCard = React.memo(function NextPostCard({
+  post,
+}: NextPostCardProps) {
   const navigate = useNavigate();
   const category = post.tags?.[0];
 
@@ -109,4 +112,4 @@ export function NextPostCard({ post }: NextPostCardProps) {
       </div>
     </motion.div>
   );
-}
+});

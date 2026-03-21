@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Twitter, Facebook, Instagram, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,15 +17,15 @@ interface ShareBarProps {
 export default function ShareBar({ title, slug }: ShareBarProps) {
   const [copied, setCopied] = useState<string | null>(null);
 
-  const copyToClipboard = async (text: string, label: string) => {
+  const copyToClipboard = useCallback(async (text: string, label: string) => {
     await navigator.clipboard.writeText(text);
     setCopied(label);
     setTimeout(() => setCopied(null), 2000);
-  };
+  }, []);
 
-  const openInNewTab = (url: string) => {
+  const openInNewTab = useCallback((url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
-  };
+  }, []);
 
   return (
     <div className="flex items-center gap-3">

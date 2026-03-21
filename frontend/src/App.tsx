@@ -11,7 +11,7 @@ import { queryClient } from "./lib/queryClient";
 import { Navigation } from "./components/layout/Navigation";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgress } from "./components/ui/ScrollProgress";
-import { GlobalCanvas } from "./components/3d/GlobalCanvas";
+import { GlobalCanvasLoader } from "./components/layout/GlobalCanvasLoader";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { SectionError } from "./components/ui/SectionError";
 import { HomeSEO } from "./pages/HomeSEO";
@@ -86,7 +86,7 @@ export function App() {
           <div className="text-text-primary min-h-screen">
             {/* Global 3D Canvas — wrapped in boundary so GPU failures don't blank the page */}
             <ErrorBoundary fallback={null}>
-              <GlobalCanvas />
+              <GlobalCanvasLoader />
             </ErrorBoundary>
 
             {/* Scroll Progress Bar */}

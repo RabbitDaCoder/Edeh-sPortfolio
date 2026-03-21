@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -34,7 +34,10 @@ export function GuestbookPage() {
     return () => observer.disconnect();
   }, [handleObserver]);
 
-  const allEntries = data?.pages.flatMap((p) => p.data) ?? [];
+  const allEntries = useMemo(
+    () => data?.pages.flatMap((p) => p.data) ?? [],
+    [data],
+  );
 
   return (
     <>

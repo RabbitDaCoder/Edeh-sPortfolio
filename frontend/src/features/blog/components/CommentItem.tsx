@@ -1,3 +1,4 @@
+import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { MessageSquare, User } from "lucide-react";
 import { motion } from "framer-motion";
@@ -17,11 +18,7 @@ interface CommentItemProps {
   depth?: number;
 }
 
-export default function CommentItem({
-  comment,
-  onReply,
-  depth = 0,
-}: CommentItemProps) {
+function CommentItemInner({ comment, onReply, depth = 0 }: CommentItemProps) {
   const timeAgo = formatDistanceToNow(new Date(comment.createdAt), {
     addSuffix: true,
   });
@@ -86,3 +83,6 @@ export default function CommentItem({
     </motion.div>
   );
 }
+
+const CommentItem = React.memo(CommentItemInner);
+export default CommentItem;

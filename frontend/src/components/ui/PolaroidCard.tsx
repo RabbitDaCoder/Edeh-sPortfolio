@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import type { Polaroid } from "../../data/portfolio";
 
@@ -6,7 +7,10 @@ type Props = {
   index: number;
 };
 
-export function PolaroidCard({ polaroid, index }: Props) {
+export const PolaroidCard = React.memo(function PolaroidCard({
+  polaroid,
+  index,
+}: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, rotate: polaroid.rotation }}
@@ -119,4 +123,4 @@ export function PolaroidCard({ polaroid, index }: Props) {
       </div>
     </motion.div>
   );
-}
+});
