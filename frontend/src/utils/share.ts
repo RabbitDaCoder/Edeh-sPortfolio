@@ -4,7 +4,7 @@ const OWNER_HANDLES = {
   facebook: "daniels.christian.77",
 } as const;
 
-const SITE_URL = import.meta.env.VITE_SITE_URL || "https://edehchinedu.com";
+const SITE_URL = import.meta.env.VITE_SITE_URL || "https://edehchinedu.dev";
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || "";
 
 export function buildPostUrl(slug: string): string {

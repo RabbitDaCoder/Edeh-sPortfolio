@@ -11,6 +11,22 @@
       "dest": "/assets/$1"
     },
     {
+      "src": "/sitemap.xml",
+      "dest": "/sitemap.xml"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/robots.txt"
+    },
+    {
+      "src": "/Resume.pdf",
+      "dest": "/Resume.pdf"
+    },
+    {
+      "src": "/google7f03bc9841be2e7a.html",
+      "dest": "/google7f03bc9841be2e7a.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
