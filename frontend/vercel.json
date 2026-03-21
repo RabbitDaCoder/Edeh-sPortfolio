@@ -27,6 +27,18 @@
       "dest": "/google7f03bc9841be2e7a.html"
     },
     {
+      "src": "/og-image.png",
+      "dest": "/og-image.png"
+    },
+    {
+      "src": "/favicon.png",
+      "dest": "/favicon.png"
+    },
+    {
+      "src": "/site.webmanifest",
+      "dest": "/site.webmanifest"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
