@@ -1,212 +1,122 @@
-import React, { useState, useEffect } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
-import {
-  LayoutDashboard,
-  FileText,
-  BookOpen,
-  Briefcase,
-  Trophy,
-  Download,
-  Mail,
-  FolderKanban,
-  Cpu,
-  MessageSquare,
-  MessageCircle,
-  BookMarked,
-  Image,
-  Settings,
-  Menu,
-  X,
-  Sun,
-  Moon,
-  LogOut,
-  ChevronRight,
-  User,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Menu, Sun, Moon, User } from "lucide-react";
 import { ErrorBoundary } from "../components/ui/ErrorBoundary";
+import { AdminSidebar } from "../components/layout/AdminSidebar";
 
-interface NavGroup {
-  label: string;
-  items: {
-    to: string;
-    icon: React.FC<{ className?: string }>;
-    label: string;
-  }[];
-}
-
-const navGroups: NavGroup[] = [
-  {
-    label: "Overview",
-    items: [{ to: "/", icon: LayoutDashboard, label: "Dashboard" }],
-  },
-  {
-    label: "Content",
-    items: [
-      { to: "/blog", icon: FileText, label: "Blog Posts" },
-      { to: "/books", icon: BookOpen, label: "Books" },
-      { to: "/comments", icon: MessageCircle, label: "Comments" },
-      { to: "/guestbook", icon: BookMarked, label: "Guestbook" },
-    ],
-  },
-  {
-    label: "Portfolio",
-    items: [
-      { to: "/projects", icon: FolderKanban, label: "Projects" },
-      { to: "/skills", icon: Cpu, label: "Skills" },
-      { to: "/career", icon: Briefcase, label: "Career" },
-      { to: "/achievements", icon: Trophy, label: "Achievements" },
-      { to: "/testimonials", icon: MessageSquare, label: "Testimonials" },
-      { to: "/polaroids", icon: Image, label: "Polaroids" },
-    ],
-  },
-  {
-    label: "System",
-    items: [
-      { to: "/downloads", icon: Download, label: "Downloads" },
-      { to: "/messages", icon: Mail, label: "Messages" },
-      { to: "/settings", icon: Settings, label: "Settings" },
-    ],
-  },
+const NAV_LABELS: { to: string; label: string }[] = [
+  { to: "/", label: "Dashboard" },
+  { to: "/blog", label: "Blog Posts" },
+  { to: "/books", label: "Books" },
+  { to: "/comments", label: "Comments" },
+  { to: "/guestbook", label: "Guestbook" },
+  { to: "/projects", label: "Projects" },
+  { to: "/skills", label: "Skills" },
+  { to: "/career", label: "Career" },
+  { to: "/achievements", label: "Achievements" },
+  { to: "/testimonials", label: "Testimonials" },
+  { to: "/polaroids", label: "Polaroids" },
+  { to: "/downloads", label: "Downloads" },
+  { to: "/messages", label: "Messages" },
+  { to: "/settings", label: "Settings" },
 ];
 
 export function DashboardLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains("dark"),
   );
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  /* ── Drawer state management ── */
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
+
+  // Close drawer on Escape key
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setDrawerOpen(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // Prevent body scroll when drawer is open
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawerOpen]);
+
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+  const toggleDrawer = useCallback(() => setDrawerOpen((o) => !o), []);
+
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     navigate("/login", { replace: true });
-  };
+  }, [navigate]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     document.documentElement.classList.toggle("dark");
-    const next = !dark;
-    setDark(next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-  };
+    setDark((prev) => {
+      const next = !prev;
+      localStorage.setItem("theme", next ? "dark" : "light");
+      return next;
+    });
+  }, []);
 
   // Find current page label
-  const currentLabel =
-    navGroups
-      .flatMap((g) => g.items)
-      .find((n) => {
+  const currentLabel = useMemo(
+    () =>
+      NAV_LABELS.find((n) => {
         if (n.to === "/") return location.pathname === "/";
         return location.pathname.startsWith(n.to);
-      })?.label || "Dashboard";
+      })?.label || "Dashboard",
+    [location.pathname],
+  );
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Mobile backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-surface/80 backdrop-blur-xl border-r border-border/60 transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      {/* ── Backdrop (mobile only) ── */}
+      <div
+        onClick={closeDrawer}
+        className={`md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${
+          drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
-      >
-        {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-5 border-b border-border/60">
-          <NavLink to="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-              <span className="text-background text-sm font-bold font-mono">
-                E
-              </span>
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-[13px] font-semibold text-text-primary tracking-tight">
-                Edeh<span className="text-text-muted">.</span>
-              </span>
-              <span className="text-[10px] text-text-muted font-mono tracking-wider uppercase">
-                Dashboard
-              </span>
-            </div>
-          </NavLink>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1 text-text-muted hover:text-text-primary"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        aria-hidden="true"
+      />
 
-        {/* Navigation */}
-        <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
-          {navGroups.map((group) => (
-            <div key={group.label}>
-              {group.label !== "Overview" && (
-                <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-text-muted/60">
-                  {group.label}
-                </p>
-              )}
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <NavLink
-                      key={item.to}
-                      to={item.to}
-                      end={item.to === "/"}
-                      onClick={() => setSidebarOpen(false)}
-                      className={({ isActive }) =>
-                        `group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-all duration-200 ${
-                          isActive
-                            ? "bg-accent text-background font-medium shadow-sm"
-                            : "text-text-muted hover:text-text-primary hover:bg-border/40"
-                        }`
-                      }
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="flex-1">{item.label}</span>
-                      <ChevronRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-40 group-hover:translate-x-0 transition-all duration-200" />
-                    </NavLink>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* ── Sidebar ── */}
+      <AdminSidebar
+        open={drawerOpen}
+        onClose={closeDrawer}
+        onLogout={handleLogout}
+      />
 
-        {/* Bottom section */}
-        <div className="p-3 border-t border-border/60">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] text-text-muted hover:text-red-500 hover:bg-red-500/5 transition-all duration-200 w-full"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
-      </aside>
-
-      {/* Main area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* ── Main area ── */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Header */}
-        <header className="h-16 border-b border-border/60 flex items-center justify-between px-6 bg-background/80 backdrop-blur-sm">
+        <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 md:px-6 bg-background/80 backdrop-blur-sm shrink-0 z-30">
           <div className="flex items-center gap-4">
+            {/* Hamburger — visible on mobile only */}
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-border/40 transition-colors"
+              onClick={toggleDrawer}
+              className="md:hidden p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-border/40 transition-colors"
+              aria-label={drawerOpen ? "Close menu" : "Open menu"}
+              aria-expanded={drawerOpen}
             >
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="hidden lg:flex items-center gap-2">
-              <h1 className="text-sm font-medium text-text-primary">
-                {currentLabel}
-              </h1>
-            </div>
+            <h1 className="text-sm font-medium text-text-primary">
+              {currentLabel}
+            </h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -239,7 +149,7 @@ export function DashboardLayout() {
 
         {/* Page content */}
         <main
-          className="flex-1 overflow-y-auto p-6"
+          className="flex-1 overflow-y-auto p-4 md:p-6"
           ref={(el) => {
             if (el) el.scrollTop = 0;
           }}
