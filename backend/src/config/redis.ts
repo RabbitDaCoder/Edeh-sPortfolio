@@ -11,7 +11,6 @@ export const redis =
       return delay;
     },
     maxRetriesPerRequest: 3,
-    enableOfflineQueue: false,
   });
 
 redis.on("error", (err) => {

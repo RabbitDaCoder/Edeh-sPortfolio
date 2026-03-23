@@ -1,19 +1,8 @@
-import { Request, Response, NextFunction } from "express";
 import rateLimit from "express-rate-limit";
-import RedisStore from "rate-limit-redis";
-import { redis } from "../config/redis";
 
-function createStore(prefix: string) {
-  return new RedisStore({
-    sendCommand: (...args: string[]) =>
-      redis.call(args[0], ...args.slice(1)) as any,
-    prefix,
-  });
-}
+// All limiters use in-memory stores. This is fine for a single Render
+// instance and eliminates ~70% of Upstash Redis request consumption.
 
-// Use in-memory store for the global limiter to save Redis requests.
-// This is acceptable because it runs on every single HTTP request and
-// the portfolio app runs on a single Render instance.
 export const generalLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
@@ -24,7 +13,6 @@ export const generalLimiter = rateLimit({
 });
 
 export const authLimiter = rateLimit({
-  store: createStore("rl:auth:"),
   windowMs: 60 * 1000,
   max: 5,
   message: "Too many login attempts, please try again later.",
@@ -34,7 +22,6 @@ export const authLimiter = rateLimit({
 });
 
 export const contactLimiter = rateLimit({
-  store: createStore("rl:contact:"),
   windowMs: 60 * 60 * 1000,
   max: 3,
   message: "Too many contact submissions, please try again later.",
