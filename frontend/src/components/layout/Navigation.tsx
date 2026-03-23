@@ -74,8 +74,8 @@ export const Navigation: React.FC = () => {
             <span className="text-lg font-serif font-bold tracking-tight text-text-primary">
               Edeh<span className="text-text-muted">.</span>
             </span>
-            <span className="hidden sm:inline-block h-4 w-px bg-border" />
-            <span className="hidden sm:inline-block text-[0.65rem] font-mono uppercase tracking-[0.2em] text-text-muted group-hover:text-text-primary transition-colors">
+            <span className="sm:inline-block h-4 w-px bg-border" />
+            <span className="sm:inline-block text-[0.65rem] font-mono uppercase tracking-[0.2em] text-text-muted group-hover:text-text-primary transition-colors">
               RabbitDaCoder
             </span>
           </a>

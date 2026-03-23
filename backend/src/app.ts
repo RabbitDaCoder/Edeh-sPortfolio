@@ -28,7 +28,20 @@ export function createApp(): Express {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  // Swagger UI needs inline scripts/styles — relax CSP only for /api/docs
+  app.use(
+    "/api/docs",
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    }),
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec),
+  );
 
   // Dynamic sitemap.xml
   app.get("/sitemap.xml", async (req: Request, res: Response) => {

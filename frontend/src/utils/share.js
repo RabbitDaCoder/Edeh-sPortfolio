@@ -1,0 +1,36 @@
+const OWNER_HANDLES = {
+    twitter: "@EdehChinedu20",
+    instagram: "@edehchinedu20",
+    facebook: "daniels.christian.77",
+};
+const SITE_URL = import.meta.env.VITE_SITE_URL || "https://edehchinedu.dev";
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || "";
+export function buildPostUrl(slug) {
+    return `${SITE_URL}/blog/${slug}`;
+}
+export function buildTwitterShare(title, slug) {
+    const url = buildPostUrl(slug);
+    const text = encodeURIComponent(`${title}\n\n${url}\n\nvia ${OWNER_HANDLES.twitter}`);
+    return `https://twitter.com/intent/tweet?text=${text}`;
+}
+export function buildFacebookShare(slug) {
+    const url = encodeURIComponent(buildPostUrl(slug));
+    return `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+}
+export function buildFacebookCaption(title, slug) {
+    const url = buildPostUrl(slug);
+    return `${title}\n\n${url}\n\nTag me: ${OWNER_HANDLES.facebook}`;
+}
+export function buildInstagramCaption(title, slug) {
+    const url = buildPostUrl(slug);
+    return `${title}\n\n${url}\n\nTag me ${OWNER_HANDLES.instagram}`;
+}
+export function buildWhatsAppShare(title, slug) {
+    const url = buildPostUrl(slug);
+    const text = encodeURIComponent(`${title}\n\n${url}`);
+    if (WHATSAPP_NUMBER) {
+        return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
+    }
+    return `https://wa.me/?text=${text}`;
+}
+//# sourceMappingURL=share.js.map

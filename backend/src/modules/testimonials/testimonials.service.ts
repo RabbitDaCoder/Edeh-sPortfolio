@@ -8,7 +8,7 @@ import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
 import { logger } from "../../utils/logger";
 
-const CACHE_TTL = 120;
+const CACHE_TTL = 600;
 
 export class TestimonialService {
   async getTestimonials(published?: boolean) {

@@ -11,10 +11,12 @@ export const redis =
       return delay;
     },
     maxRetriesPerRequest: 3,
+    enableOfflineQueue: false,
   });
 
 redis.on("error", (err) => {
-  console.error("Redis connection error:", err);
+  // Log but don't crash — cache/rate-limit are non-critical
+  console.error("Redis connection error:", err.message ?? err);
 });
 
 redis.on("connect", () => {

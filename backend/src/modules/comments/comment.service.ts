@@ -4,6 +4,7 @@ import { CreateCommentInput } from "./comment.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
 import { logger } from "../../utils/logger";
+import { notificationService } from "../../services/notification.service";
 
 export class CommentService {
   async getComments(slug: string, page: number, limit: number) {
@@ -60,6 +61,20 @@ export class CommentService {
       { commentId: comment.id, blogSlug: slug },
       "New comment submitted for moderation",
     );
+
+    // Fire notification — non-blocking
+    const isReply = !!data.parentId;
+    notificationService
+      .create({
+        type: isReply ? "blog_reply" : "blog_comment",
+        title: isReply ? "New Reply on a Blog Post" : "New Blog Comment",
+        message: `${data.name} ${isReply ? "replied to a comment" : "commented"} on "${blog.title}": "${data.body.slice(0, 100)}${data.body.length > 100 ? "..." : ""}"`,
+        link: "/comments",
+        commentId: comment.id,
+      })
+      .catch((err) =>
+        logger.error({ err }, "Failed to create comment notification"),
+      );
 
     return comment;
   }

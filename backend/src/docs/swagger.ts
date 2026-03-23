@@ -55,6 +55,7 @@ const options = {
     "./src/modules/polaroids/polaroids.routes.ts",
     "./src/modules/comments/comment.routes.ts",
     "./src/modules/guestbook/guestbook.routes.ts",
+    "./src/modules/notifications/notification.routes.ts",
   ],
 };
 

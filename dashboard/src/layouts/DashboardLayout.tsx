@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Sun, Moon, User } from "lucide-react";
 import { ErrorBoundary } from "../components/ui/ErrorBoundary";
 import { AdminSidebar } from "../components/layout/AdminSidebar";
+import { NotificationBell } from "../components/layout/NotificationBell";
 
 const NAV_LABELS: { to: string; label: string }[] = [
   { to: "/", label: "Dashboard" },
@@ -131,6 +132,8 @@ export function DashboardLayout() {
                 <Moon className="w-4 h-4" />
               )}
             </button>
+
+            <NotificationBell />
 
             {/* Profile pill */}
             <NavLink

@@ -11,8 +11,10 @@ function createStore(prefix: string) {
   });
 }
 
+// Use in-memory store for the global limiter to save Redis requests.
+// This is acceptable because it runs on every single HTTP request and
+// the portfolio app runs on a single Render instance.
 export const generalLimiter = rateLimit({
-  store: createStore("rl:general:"),
   windowMs: 60 * 1000,
   max: 100,
   message: "Too many requests from this IP, please try again later.",

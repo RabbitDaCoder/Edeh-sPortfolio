@@ -2,6 +2,7 @@ import { guestbookRepository } from "./guestbook.repository";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
 import { logger } from "../../utils/logger";
+import { notificationService } from "../../services/notification.service";
 
 const SPAM_PATTERNS = [
   /\b(viagra|casino|poker|crypto|forex|loan|seo|backlink)\b/i,
@@ -44,6 +45,20 @@ export class GuestbookService {
     }
 
     logger.info({ entryId: entry.id }, "New guestbook entry submitted");
+
+    // Fire notification — non-blocking
+    notificationService
+      .create({
+        type: "guestbook_entry",
+        title: "New Guestbook Message",
+        message: `${data.name} left a message: "${data.message.slice(0, 100)}${data.message.length > 100 ? "..." : ""}"`,
+        link: "/guestbook",
+        guestbookEntryId: entry.id,
+      })
+      .catch((err) =>
+        logger.error({ err }, "Failed to create guestbook notification"),
+      );
+
     return entry;
   }
 

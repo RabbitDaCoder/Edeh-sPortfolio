@@ -1,0 +1,1 @@
+{"version":3,"file":"GuestbookCard.d.ts","sourceRoot":"","sources":["GuestbookCard.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,OAAO,CAAC;AAI1B,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,uBAAuB,CAAC;AAW5D,UAAU,kBAAkB;IAC1B,KAAK,EAAE,cAAc,CAAC;IACtB,KAAK,EAAE,MAAM,CAAC;CACf;AAED,eAAO,MAAM,aAAa,EAAE,KAAK,CAAC,EAAE,CAAC,kBAAkB,CA4DtD,CAAC"}
