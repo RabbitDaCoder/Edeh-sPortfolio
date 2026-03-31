@@ -1,15 +1,17 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import React from "react";
+import React, { useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route, useLocation, } from "react-router-dom";
 import { queryClient } from "./lib/queryClient";
+import { apiClient } from "./lib/axios";
 import { Navigation } from "./components/layout/Navigation";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgress } from "./components/ui/ScrollProgress";
 import { GlobalCanvasLoader } from "./components/layout/GlobalCanvasLoader";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { SectionError } from "./components/ui/SectionError";
+import { SplashScreen } from "./components/ui/SplashScreen";
 import { HomeSEO } from "./pages/HomeSEO";
 import "./index.css";
 function ScrollToTop() {
@@ -46,7 +48,55 @@ const PrivacyPage = React.lazy(() => import("./pages/legal/PrivacyPage"));
 const TermsPage = React.lazy(() => import("./pages/legal/TermsPage"));
 // Suspense fallback
 const PageFallback = () => (_jsx("div", { className: "min-h-screen flex items-center justify-center", children: _jsx("div", { className: "text-text-muted", children: "Loading..." }) }));
+// ─── Boot tasks — prefetch critical data into React Query cache ──────────────
+const BOOT_TASKS = [
+    {
+        label: "API health check",
+        run: async () => {
+            const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+            const healthUrl = baseUrl.replace(/\/api\/v\d+$/, "/health");
+            const res = await fetch(healthUrl);
+            if (!res.ok)
+                throw new Error(`HTTP ${res.status}`);
+        },
+    },
+    {
+        label: "Profile data",
+        run: async () => {
+            await apiClient.get("/profile");
+        },
+    },
+    {
+        label: "Skills catalogue",
+        run: async () => {
+            await apiClient.get("/skills");
+        },
+    },
+    {
+        label: "Projects portfolio",
+        run: async () => {
+            await apiClient.get("/projects?published=true");
+        },
+    },
+    {
+        label: "Career timeline",
+        run: async () => {
+            await apiClient.get("/career");
+        },
+    },
+    {
+        label: "Blog articles",
+        run: async () => {
+            await apiClient.get("/blog", { params: { page: 1, limit: 6 } });
+        },
+    },
+];
 export function App() {
-    return (_jsx(HelmetProvider, { children: _jsx(QueryClientProvider, { client: queryClient, children: _jsxs(Router, { future: { v7_startTransition: true, v7_relativeSplatPath: true }, children: [_jsx(ScrollToTop, {}), _jsxs("div", { className: "text-text-primary min-h-screen", children: [_jsx(ErrorBoundary, { fallback: null, children: _jsx(GlobalCanvasLoader, {}) }), _jsx(ScrollProgress, {}), _jsx(Navigation, {}), _jsx("main", { className: "relative z-10 pt-16 overflow-x-hidden", children: _jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsxs("div", { className: "divide-y divide-border/10", children: [_jsx(HomeSEO, {}), _jsx(HeroSection, {}), _jsx(AboutSection, {}), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(SkillsSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(WorkSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(CareerSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(AchievementsSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(TestimonialsSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(BlogPreviewSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(BooksPreviewSection, {}) }), _jsx(BookCallSection, {}), _jsx(CvDownloadSection, {})] }) }), _jsx(Route, { path: "/blog", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BlogPage, {}) }) }) }), _jsx(Route, { path: "/blog/:slug", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BlogDetailPage, {}) }) }) }), _jsx(Route, { path: "/books", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BooksPage, {}) }) }) }), _jsx(Route, { path: "/books/:slug", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BooksDetailPage, {}) }) }) }), _jsx(Route, { path: "/contact", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(ContactPage, {}) }) }) }), _jsx(Route, { path: "/projects", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(ProjectsPage, {}) }) }) }), _jsx(Route, { path: "/guestbook", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(GuestbookPage, {}) }) }) }), _jsx(Route, { path: "/guestbook/create", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(GuestbookCreatePage, {}) }) }) }), _jsx(Route, { path: "/privacy", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(PrivacyPage, {}) }) }), _jsx(Route, { path: "/terms", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(TermsPage, {}) }) })] }) }), _jsx("div", { className: "relative z-10", children: _jsx(Footer, {}) })] })] }) }) }));
+    const [ready, setReady] = useState(false);
+    return (_jsx(HelmetProvider, { children: _jsxs(QueryClientProvider, { client: queryClient, children: [!ready && (_jsx(SplashScreen, { appName: "EDEH CHINEDU", version: "1.0.0", tasks: BOOT_TASKS, minDisplayMs: 2000, onReady: () => setReady(true) })), _jsx("div", { style: {
+                        opacity: ready ? 1 : 0,
+                        transition: "opacity 0.5s ease",
+                        pointerEvents: ready ? "all" : "none",
+                    }, children: _jsxs(Router, { future: { v7_startTransition: true, v7_relativeSplatPath: true }, children: [_jsx(ScrollToTop, {}), _jsxs("div", { className: "text-text-primary min-h-screen", children: [_jsx(ErrorBoundary, { fallback: null, children: _jsx(GlobalCanvasLoader, {}) }), _jsx(ScrollProgress, {}), _jsx(Navigation, {}), _jsx("main", { className: "relative z-10 pt-16 overflow-x-hidden", children: _jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsxs("div", { className: "divide-y divide-border/10", children: [_jsx(HomeSEO, {}), _jsx(HeroSection, {}), _jsx(AboutSection, {}), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(SkillsSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(WorkSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(CareerSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(AchievementsSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(TestimonialsSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(BlogPreviewSection, {}) }), _jsx(ErrorBoundary, { fallback: _jsx(SectionError, {}), children: _jsx(BooksPreviewSection, {}) }), _jsx(BookCallSection, {}), _jsx(CvDownloadSection, {})] }) }), _jsx(Route, { path: "/blog", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BlogPage, {}) }) }) }), _jsx(Route, { path: "/blog/:slug", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BlogDetailPage, {}) }) }) }), _jsx(Route, { path: "/books", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BooksPage, {}) }) }) }), _jsx(Route, { path: "/books/:slug", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(BooksDetailPage, {}) }) }) }), _jsx(Route, { path: "/contact", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(ContactPage, {}) }) }) }), _jsx(Route, { path: "/projects", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(ProjectsPage, {}) }) }) }), _jsx(Route, { path: "/guestbook", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(GuestbookPage, {}) }) }) }), _jsx(Route, { path: "/guestbook/create", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(ErrorBoundary, { children: _jsx(GuestbookCreatePage, {}) }) }) }), _jsx(Route, { path: "/privacy", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(PrivacyPage, {}) }) }), _jsx(Route, { path: "/terms", element: _jsx(React.Suspense, { fallback: _jsx(PageFallback, {}), children: _jsx(TermsPage, {}) }) })] }) }), _jsx("div", { className: "relative z-10", children: _jsx(Footer, {}) })] })] }) })] }) }));
 }
 //# sourceMappingURL=App.js.map

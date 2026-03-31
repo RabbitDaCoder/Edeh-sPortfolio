@@ -7,7 +7,7 @@ import { PERSONAL } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 export const HeroSection: React.FC = () => {
-  const { data: personal = PERSONAL } = useProfile();
+  const { data: personal = PERSONAL, isLoading } = useProfile();
   const headlineRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -28,20 +28,22 @@ export const HeroSection: React.FC = () => {
     });
   }, []);
 
+  const displayName = personal?.name ?? PERSONAL.name;
+
   return (
     <Section id="hero" className="min-h-screen flex items-center">
       <div className="w-full max-w-3xl overflow-hidden">
         {/* Text content */}
         <div className="space-y-8">
           <Badge variant="pulse" className="text-xs">
-            {personal.availability}
+            {personal?.availability ?? PERSONAL.availability}
           </Badge>
 
           <h1
             ref={headlineRef}
             className="text-display-2xl font-serif text-text-primary leading-[0.9] tracking-tight break-words"
           >
-            {personal.name.split(" ").map((part, i, arr) => (
+            {displayName.split(" ").map((part, i, arr) => (
               <span
                 key={part}
                 className={`hero-line block ${
@@ -59,7 +61,7 @@ export const HeroSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="text-body-lg text-text-muted max-w-lg"
           >
-            {personal.tagline}
+            {personal?.tagline ?? PERSONAL.tagline}
           </motion.p>
         </div>
       </div>

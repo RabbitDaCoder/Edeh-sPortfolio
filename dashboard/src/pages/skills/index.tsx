@@ -13,6 +13,10 @@ const CATEGORIES = [
   "DEVOPS",
   "THREED",
   "TOOLS",
+  "STATE",
+  "BLOCKCHAIN",
+  "OTHER",
+  "LANGUAGES",
 ] as const;
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -22,6 +26,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   DEVOPS: "DevOps",
   THREED: "3D & Creative",
   TOOLS: "Tools",
+  STATE: "State Management",
+  BLOCKCHAIN: "Blockchain & Web3",
+  OTHER: "Other",
+  LANGUAGES: "Programming Languages",
 };
 
 const skillSchema = z.object({

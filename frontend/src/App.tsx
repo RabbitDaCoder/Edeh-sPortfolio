@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -8,12 +8,14 @@ import {
   useLocation,
 } from "react-router-dom";
 import { queryClient } from "./lib/queryClient";
+import { apiClient } from "./lib/axios";
 import { Navigation } from "./components/layout/Navigation";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgress } from "./components/ui/ScrollProgress";
 import { GlobalCanvasLoader } from "./components/layout/GlobalCanvasLoader";
 import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { SectionError } from "./components/ui/SectionError";
+import { SplashScreen, BootTask } from "./components/ui/SplashScreen";
 import { HomeSEO } from "./pages/HomeSEO";
 import "./index.css";
 
@@ -75,10 +77,72 @@ const PageFallback = () => (
   </div>
 );
 
+// ─── Boot tasks — prefetch critical data into React Query cache ──────────────
+
+const BOOT_TASKS: BootTask[] = [
+  {
+    label: "API health check",
+    run: async () => {
+      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+      const healthUrl = baseUrl.replace(/\/api\/v\d+$/, "/health");
+      const res = await fetch(healthUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    },
+  },
+  {
+    label: "Profile data",
+    run: async () => {
+      await apiClient.get("/profile");
+    },
+  },
+  {
+    label: "Skills catalogue",
+    run: async () => {
+      await apiClient.get("/skills");
+    },
+  },
+  {
+    label: "Projects portfolio",
+    run: async () => {
+      await apiClient.get("/projects?published=true");
+    },
+  },
+  {
+    label: "Career timeline",
+    run: async () => {
+      await apiClient.get("/career");
+    },
+  },
+  {
+    label: "Blog articles",
+    run: async () => {
+      await apiClient.get("/blog", { params: { page: 1, limit: 6 } });
+    },
+  },
+];
+
 export function App() {
+  const [ready, setReady] = useState(false);
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
+        {!ready && (
+          <SplashScreen
+            appName="EDEH CHINEDU"
+            version="1.0.0"
+            tasks={BOOT_TASKS}
+            minDisplayMs={2000}
+            onReady={() => setReady(true)}
+          />
+        )}
+
+        <div
+          style={{
+            opacity: ready ? 1 : 0,
+            transition: "opacity 0.5s ease",
+            pointerEvents: ready ? "all" : "none",
+          }}
+        >
         <Router
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
@@ -249,6 +313,7 @@ export function App() {
             </div>
           </div>
         </Router>
+        </div>
       </QueryClientProvider>
     </HelmetProvider>
   );

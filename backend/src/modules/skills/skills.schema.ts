@@ -7,6 +7,10 @@ const TECH_CATEGORIES = [
   "DEVOPS",
   "THREED",
   "TOOLS",
+  "STATE",
+  "BLOCKCHAIN",
+  "OTHER",
+  "LANGUAGES",
 ] as const;
 
 export const createSkillSchema = z.object({

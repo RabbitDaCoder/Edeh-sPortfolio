@@ -18,6 +18,9 @@ const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
 export const AboutSection: React.FC = () => {
   const { data: personal = PERSONAL } = useProfile();
 
+  const bio = personal?.bio ?? PERSONAL.bio;
+  const pullQuote = personal?.pullQuote ?? PERSONAL.pullQuote;
+
   return (
     <Section id="about" className="bg-surface/30">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
@@ -44,8 +47,8 @@ export const AboutSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="space-y-4 text-text-muted leading-relaxed"
           >
-            <p>{personal.bio[0]}</p>
-            <p>{personal.bio[1]}</p>
+            <p>{bio[0]}</p>
+            <p>{bio[1]}</p>
           </motion.div>
 
           <motion.div
@@ -56,7 +59,7 @@ export const AboutSection: React.FC = () => {
           >
             <Card className="border-l-4 border-l-accent pl-6 py-4">
               <blockquote className="italic text-text-primary">
-                &ldquo;{personal.pullQuote}&rdquo;
+                &ldquo;{pullQuote}&rdquo;
               </blockquote>
             </Card>
           </motion.div>
