@@ -34,11 +34,11 @@ function nowStamp(): string {
 const delay = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
 
 const LEVEL_META: Record<LogLevel, { badge: string; color: string }> = {
-  system:  { badge: "SYS ", color: "var(--text-muted)" },
-  info:    { badge: "INFO", color: "var(--text-muted)" },
+  system: { badge: "SYS ", color: "var(--text-muted)" },
+  info: { badge: "INFO", color: "var(--text-muted)" },
   success: { badge: " OK ", color: "#4ade80" },
-  warn:    { badge: "WARN", color: "#fbbf24" },
-  error:   { badge: "ERR ", color: "#f87171" },
+  warn: { badge: "WARN", color: "#fbbf24" },
+  error: { badge: "ERR ", color: "#f87171" },
 };
 
 // ─── SplashScreen ────────────────────────────────────────────────────────────
@@ -88,7 +88,11 @@ export function SplashScreen({
       push("info", "INIT", "Initialising runtime environment…");
 
       await delay(400);
-      push("info", "INIT", `Loading ${tasks.length} service${tasks.length !== 1 ? "s" : ""}…`);
+      push(
+        "info",
+        "INIT",
+        `Loading ${tasks.length} service${tasks.length !== 1 ? "s" : ""}…`,
+      );
       await delay(300);
 
       for (let i = 0; i < tasks.length; i++) {
@@ -177,7 +181,10 @@ export function SplashScreen({
             >
               {appName}
             </span>
-            <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+            <span
+              className="text-[11px]"
+              style={{ color: "var(--text-muted)" }}
+            >
               v{version}
             </span>
           </div>
@@ -211,10 +218,15 @@ export function SplashScreen({
                 >
                   [{meta.badge}]
                 </span>
-                <span className="shrink-0 min-w-[36px]" style={{ color: "var(--text-muted)" }}>
+                <span
+                  className="shrink-0 min-w-[36px]"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   {line.prefix}
                 </span>
-                <span style={{ color: "var(--text-primary)" }}>{line.message}</span>
+                <span style={{ color: "var(--text-primary)" }}>
+                  {line.message}
+                </span>
               </div>
             );
           })}

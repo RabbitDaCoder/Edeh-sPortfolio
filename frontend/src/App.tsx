@@ -83,7 +83,8 @@ const BOOT_TASKS: BootTask[] = [
   {
     label: "API health check",
     run: async () => {
-      const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+      const baseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
       const healthUrl = baseUrl.replace(/\/api\/v\d+$/, "/health");
       const res = await fetch(healthUrl);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -143,176 +144,176 @@ export function App() {
             pointerEvents: ready ? "all" : "none",
           }}
         >
-        <Router
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
-          <ScrollToTop />
-          <div className="text-text-primary min-h-screen">
-            {/* Global 3D Canvas — wrapped in boundary so GPU failures don't blank the page */}
-            <ErrorBoundary fallback={null}>
-              <GlobalCanvasLoader />
-            </ErrorBoundary>
+          <Router
+            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+          >
+            <ScrollToTop />
+            <div className="text-text-primary min-h-screen">
+              {/* Global 3D Canvas — wrapped in boundary so GPU failures don't blank the page */}
+              <ErrorBoundary fallback={null}>
+                <GlobalCanvasLoader />
+              </ErrorBoundary>
 
-            {/* Scroll Progress Bar */}
-            <ScrollProgress />
+              {/* Scroll Progress Bar */}
+              <ScrollProgress />
 
-            {/* Navigation */}
-            <Navigation />
+              {/* Navigation */}
+              <Navigation />
 
-            {/* Main Content */}
-            <main className="relative z-10 pt-16 overflow-x-hidden">
-              <Routes>
-                {/* Home - Single Page with all sections */}
-                <Route
-                  path="/"
-                  element={
-                    <div className="divide-y divide-border/10">
-                      <HomeSEO />
-                      <HeroSection />
-                      <AboutSection />
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <SkillsSection />
-                      </ErrorBoundary>
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <WorkSection />
-                      </ErrorBoundary>
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <CareerSection />
-                      </ErrorBoundary>
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <AchievementsSection />
-                      </ErrorBoundary>
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <TestimonialsSection />
-                      </ErrorBoundary>
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <BlogPreviewSection />
-                      </ErrorBoundary>
-                      <ErrorBoundary fallback={<SectionError />}>
-                        <BooksPreviewSection />
-                      </ErrorBoundary>
-                      <BookCallSection />
-                      <CvDownloadSection />
-                    </div>
-                  }
-                />
+              {/* Main Content */}
+              <main className="relative z-10 pt-16 overflow-x-hidden">
+                <Routes>
+                  {/* Home - Single Page with all sections */}
+                  <Route
+                    path="/"
+                    element={
+                      <div className="divide-y divide-border/10">
+                        <HomeSEO />
+                        <HeroSection />
+                        <AboutSection />
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <SkillsSection />
+                        </ErrorBoundary>
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <WorkSection />
+                        </ErrorBoundary>
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <CareerSection />
+                        </ErrorBoundary>
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <AchievementsSection />
+                        </ErrorBoundary>
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <TestimonialsSection />
+                        </ErrorBoundary>
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <BlogPreviewSection />
+                        </ErrorBoundary>
+                        <ErrorBoundary fallback={<SectionError />}>
+                          <BooksPreviewSection />
+                        </ErrorBoundary>
+                        <BookCallSection />
+                        <CvDownloadSection />
+                      </div>
+                    }
+                  />
 
-                {/* Blog Routes */}
-                <Route
-                  path="/blog"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <BlogPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
-                <Route
-                  path="/blog/:slug"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <BlogDetailPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
+                  {/* Blog Routes */}
+                  <Route
+                    path="/blog"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <BlogPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
+                  <Route
+                    path="/blog/:slug"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <BlogDetailPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
 
-                {/* Books Routes */}
-                <Route
-                  path="/books"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <BooksPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
-                <Route
-                  path="/books/:slug"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <BooksDetailPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
+                  {/* Books Routes */}
+                  <Route
+                    path="/books"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <BooksPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
+                  <Route
+                    path="/books/:slug"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <BooksDetailPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
 
-                {/* Contact Route */}
-                <Route
-                  path="/contact"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <ContactPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
+                  {/* Contact Route */}
+                  <Route
+                    path="/contact"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <ContactPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
 
-                {/* Projects Route */}
-                <Route
-                  path="/projects"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <ProjectsPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
+                  {/* Projects Route */}
+                  <Route
+                    path="/projects"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <ProjectsPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
 
-                {/* Guestbook Route */}
-                <Route
-                  path="/guestbook"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <GuestbookPage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
-                <Route
-                  path="/guestbook/create"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <ErrorBoundary>
-                        <GuestbookCreatePage />
-                      </ErrorBoundary>
-                    </React.Suspense>
-                  }
-                />
+                  {/* Guestbook Route */}
+                  <Route
+                    path="/guestbook"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <GuestbookPage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
+                  <Route
+                    path="/guestbook/create"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <ErrorBoundary>
+                          <GuestbookCreatePage />
+                        </ErrorBoundary>
+                      </React.Suspense>
+                    }
+                  />
 
-                {/* Legal Routes */}
-                <Route
-                  path="/privacy"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <PrivacyPage />
-                    </React.Suspense>
-                  }
-                />
-                <Route
-                  path="/terms"
-                  element={
-                    <React.Suspense fallback={<PageFallback />}>
-                      <TermsPage />
-                    </React.Suspense>
-                  }
-                />
-              </Routes>
-            </main>
+                  {/* Legal Routes */}
+                  <Route
+                    path="/privacy"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <PrivacyPage />
+                      </React.Suspense>
+                    }
+                  />
+                  <Route
+                    path="/terms"
+                    element={
+                      <React.Suspense fallback={<PageFallback />}>
+                        <TermsPage />
+                      </React.Suspense>
+                    }
+                  />
+                </Routes>
+              </main>
 
-            {/* Footer */}
-            <div className="relative z-10">
-              <Footer />
+              {/* Footer */}
+              <div className="relative z-10">
+                <Footer />
+              </div>
             </div>
-          </div>
-        </Router>
+          </Router>
         </div>
       </QueryClientProvider>
     </HelmetProvider>
