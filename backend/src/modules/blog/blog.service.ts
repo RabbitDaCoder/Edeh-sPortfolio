@@ -74,6 +74,24 @@ export class BlogService {
     return blog;
   }
 
+  async getBlogById(id: string) {
+    const cacheKey = `blog:id:${id}`;
+
+    const cached = await cacheService.get<any>(cacheKey);
+    if (cached) {
+      logger.debug({ cacheKey }, "Cache hit for blog by id");
+      return cached;
+    }
+
+    const blog = await blogRepository.findById(id);
+    if (!blog) {
+      throw new AppError(ErrorCode.BLOG_NOT_FOUND);
+    }
+
+    await cacheService.set(cacheKey, blog, CACHE_TTL);
+    return blog;
+  }
+
   async createBlog(data: CreateBlogInput) {
     const blog = await blogRepository.create(data);
     await this.invalidateCache();
@@ -88,6 +106,7 @@ export class BlogService {
 
     const updated = await blogRepository.update(id, data);
     await this.invalidateCache(`blog:slug:${blog.slug}`);
+    await cacheService.del(`blog:id:${id}`);
 
     return updated;
   }
@@ -100,6 +119,7 @@ export class BlogService {
 
     await blogRepository.delete(id);
     await this.invalidateCache(`blog:slug:${blog.slug}`);
+    await cacheService.del(`blog:id:${id}`);
   }
 
   async toggleFeatured(id: string) {
@@ -112,6 +132,7 @@ export class BlogService {
       featured: !blog.featured,
     });
     await this.invalidateCache(`blog:slug:${blog.slug}`);
+    await cacheService.del(`blog:id:${id}`);
     return updated;
   }
 

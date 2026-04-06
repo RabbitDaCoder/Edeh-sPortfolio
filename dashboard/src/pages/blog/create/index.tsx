@@ -160,7 +160,12 @@ export function CreateBlogPage() {
       </div>
 
       <form
-        onSubmit={handleSubmit((d) => mutation.mutate(d))}
+        onSubmit={(e) => {
+          if (editorMode === "markdown" && markdownSrc) {
+            setValue("content", markdownSrc, { shouldValidate: false });
+          }
+          handleSubmit((d) => mutation.mutate(d))(e);
+        }}
         className="space-y-6 max-w-3xl"
       >
         <div className="grid gap-4">

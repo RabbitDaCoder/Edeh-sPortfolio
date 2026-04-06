@@ -15,6 +15,7 @@ import {
   getBlogs,
   getFeaturedBlogs,
   getBlogBySlug,
+  getBlogById,
   getNextPost,
   createBlog,
   updateBlog,
@@ -97,6 +98,28 @@ router.get("/featured", getFeaturedBlogs);
  *         description: Current blog post not found
  */
 router.get("/:slug/next", getNextPost);
+
+/**
+ * @swagger
+ * /api/v1/blog/id/{id}:
+ *   get:
+ *     summary: Get a single blog post by ID (admin)
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog post details
+ *       404:
+ *         description: Blog post not found
+ */
+router.get("/id/:id", authMiddleware, getBlogById);
 
 /**
  * @swagger

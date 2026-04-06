@@ -56,6 +56,20 @@ export async function getBlogBySlug(
   }
 }
 
+export async function getBlogById(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { id } = req.params;
+    const blog = await blogService.getBlogById(id);
+    success(res, blog);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function createBlog(
   req: Request,
   res: Response,

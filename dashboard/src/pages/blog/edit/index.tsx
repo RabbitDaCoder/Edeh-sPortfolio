@@ -42,7 +42,7 @@ export function EditBlogPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["blog", id],
-    queryFn: () => apiClient.get(`blog/${id}`),
+    queryFn: () => apiClient.get(`blog/id/${id}`),
     enabled: !!id,
   });
 
@@ -159,7 +159,12 @@ export function EditBlogPage() {
       </div>
 
       <form
-        onSubmit={handleSubmit((d) => mutation.mutate(d))}
+        onSubmit={(e) => {
+          if (editorMode === "markdown" && markdownSrc) {
+            setValue("content", markdownSrc, { shouldValidate: false });
+          }
+          handleSubmit((d) => mutation.mutate(d))(e);
+        }}
         className="space-y-6 max-w-3xl"
       >
         <div className="grid gap-4">
