@@ -49,7 +49,9 @@ async function pruneOldBackups(): Promise<void> {
 
     const toDelete = sorted.slice(0, sorted.length - MAX_BACKUPS);
     for (const res of toDelete) {
-      await cloudinary.uploader.destroy(res.public_id, { resource_type: "raw" });
+      await cloudinary.uploader.destroy(res.public_id, {
+        resource_type: "raw",
+      });
       logger.info({ publicId: res.public_id }, "Pruned old backup");
     }
   } catch (err) {
@@ -74,13 +76,18 @@ async function runBackup(): Promise<void> {
  */
 export function startBackupScheduler(): void {
   // Run first backup 5 minutes after server start
-  startupTimer = setTimeout(() => {
-    startupTimer = null;
-    runBackup();
-    timer = setInterval(runBackup, BACKUP_INTERVAL_MS);
-  }, 5 * 60 * 1000);
+  startupTimer = setTimeout(
+    () => {
+      startupTimer = null;
+      runBackup();
+      timer = setInterval(runBackup, BACKUP_INTERVAL_MS);
+    },
+    5 * 60 * 1000,
+  );
 
-  logger.info("Backup scheduler initialized — first backup in 5 minutes, then every 24h");
+  logger.info(
+    "Backup scheduler initialized — first backup in 5 minutes, then every 24h",
+  );
 }
 
 export function stopBackupScheduler(): void {

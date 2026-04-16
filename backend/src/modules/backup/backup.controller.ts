@@ -32,7 +32,11 @@ export async function uploadRestore(req: Request, res: Response) {
     const backup = req.body as BackupData;
 
     if (!backup?.version || !backup?.tables) {
-      return error(res, ErrorCode.VALIDATION_ERROR, "Invalid backup format — must include version and tables");
+      return error(
+        res,
+        ErrorCode.VALIDATION_ERROR,
+        "Invalid backup format — must include version and tables",
+      );
     }
 
     const result = await restoreBackup(backup);

@@ -47,7 +47,9 @@ export async function createBackup(): Promise<BackupData> {
 
   // Strip sensitive fields
   if (tables.user) {
-    tables.user = (tables.user as any[]).map(({ password, refreshToken, ...rest }) => rest);
+    tables.user = (tables.user as any[]).map(
+      ({ password, refreshToken, ...rest }) => rest,
+    );
   }
 
   return {
@@ -61,7 +63,9 @@ export async function createBackup(): Promise<BackupData> {
  * Restore database from a backup snapshot.
  * Uses upsert to avoid duplicate-key errors — safe to run multiple times.
  */
-export async function restoreBackup(backup: BackupData): Promise<{ restored: Record<string, number> }> {
+export async function restoreBackup(
+  backup: BackupData,
+): Promise<{ restored: Record<string, number> }> {
   const restored: Record<string, number> = {};
 
   // Order matters — restore parents before children
