@@ -10,6 +10,7 @@ const envSchema = z.object({
     .default("development"),
   PORT: z.string().transform(Number).default("4000"),
   DATABASE_URL: z.string(),
+  DIRECT_DATABASE_URL: z.string().optional(),
   REDIS_URL: z.string(),
   JWT_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),

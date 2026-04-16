@@ -1,6 +1,7 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
 import { logger } from "./utils/logger";
+import { startBackupScheduler, stopBackupScheduler } from "./jobs/backup.job";
 
 // Lazy-load mail worker only when needed — it opens a separate Redis
 // connection that counts against Upstash request limits even when idle.
@@ -24,6 +25,7 @@ async function startServer(): Promise<void> {
       logger.info({ port: env.PORT, env: env.NODE_ENV }, "Server started");
     });
     await initMailWorker();
+    startBackupScheduler();
   } catch (error) {
     logger.error({ error }, "Server startup failed");
     process.exit(1);
@@ -32,12 +34,14 @@ async function startServer(): Promise<void> {
 
 process.on("SIGINT", async () => {
   logger.info("Shutting down gracefully");
+  stopBackupScheduler();
   await mailWorker?.close();
   process.exit(0);
 });
 
 process.on("SIGTERM", async () => {
   logger.info("Shutting down gracefully");
+  stopBackupScheduler();
   await mailWorker?.close();
   process.exit(0);
 });

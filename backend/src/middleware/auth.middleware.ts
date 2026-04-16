@@ -44,3 +44,14 @@ export function authMiddleware(
     return error(res, ErrorCode.UNAUTHORIZED) as any;
   }
 }
+
+export function adminGuard(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  if (req.user?.role !== "ADMIN") {
+    return error(res, ErrorCode.FORBIDDEN, "Admin access required") as any;
+  }
+  next();
+}

@@ -18,6 +18,7 @@ import {
   publicCommentRouter,
   adminCommentRouter,
 } from "../../modules/comments/comment.routes";
+import backupRoutes from "../../modules/backup/backup.routes";
 
 const router = Router();
 
@@ -38,5 +39,6 @@ router.use("/testimonials", testimonialRoutes);
 router.use("/profile", profileRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/polaroids", polaroidRoutes);
+router.use("/admin/backup", backupRoutes);
 
 export default router;
