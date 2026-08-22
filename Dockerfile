@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# System deps for native modules and Prisma
+# System deps for native modules
 RUN apk add --no-cache python3 make g++ openssl openssl-dev
 
 # 1. Copy manifests first (maximizes Docker layer cache)
@@ -15,16 +15,12 @@ COPY email-service/package.json email-service/
 # 2. Install ALL deps (dev + prod) for building
 RUN npm ci --workspace=backend
 
-# 3. Copy Prisma schema and generate client
-COPY backend/prisma backend/prisma
-RUN npx --prefix backend prisma generate --schema=backend/prisma/schema.prisma
-
-# 4. Copy source and build
+# 3. Copy source and build
 COPY backend/src backend/src
 COPY backend/tsconfig.json backend/
 RUN npm run build --workspace=backend
 
-# 5. Prune dev dependencies for production image
+# 4. Prune dev dependencies for production image
 RUN npm prune --production --workspace=backend
 
 # ─── Stage 2: Production ─────────────────────────────────────────────
@@ -37,7 +33,6 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/package.json ./backend/
-COPY --from=builder /app/backend/prisma ./backend/prisma
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
 
 # Copy frontend/dashboard/email-service stubs so workspace resolution works
@@ -65,5 +60,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Sync MongoDB schema + start server
+# Start server
 CMD ["./docker-entrypoint.sh"]

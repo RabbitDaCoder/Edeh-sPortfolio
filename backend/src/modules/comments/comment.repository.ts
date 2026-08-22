@@ -117,7 +117,7 @@ export class CommentRepository {
       where: { parentId: id },
       select: { id: true },
     });
-    await Promise.all(replies.map((reply) => this.delete(reply.id)));
+    await Promise.all(replies.map((reply: { id: string }) => this.delete(reply.id)));
 
     return db.comment.delete({
       where: { id },

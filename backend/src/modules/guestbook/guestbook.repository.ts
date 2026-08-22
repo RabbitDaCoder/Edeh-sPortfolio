@@ -43,18 +43,18 @@ export class GuestbookRepository {
     // On page 1, remove the first-ever entry from its natural position
     // and prepend it so it always appears at index 0
     if (page === 1 && firstId) {
-      const filtered = entries.filter((e) => e.id !== firstId);
+      const filtered = entries.filter((e: { id: string }) => e.id !== firstId);
       const tagged = [
         { ...firstEver, isFirstPost: true },
-        ...filtered.map((e) => ({ ...e, isFirstPost: false })),
+        ...filtered.map((e: { id: string }) => ({ ...e, isFirstPost: false })),
       ];
       return { entries: tagged, total };
     }
 
     // On later pages, just exclude the first-ever entry (already shown on p1)
     const tagged = entries
-      .filter((e) => e.id !== firstId)
-      .map((e) => ({ ...e, isFirstPost: false }));
+      .filter((e: { id: string }) => e.id !== firstId)
+      .map((e: { id: string }) => ({ ...e, isFirstPost: false }));
     return { entries: tagged, total };
   }
 

@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import bcryptjs from "bcryptjs";
-
-const prisma = new PrismaClient();
+import { db, mongoClient } from "../src/config/db";
 
 const EMAIL = "edehchinedu59@gmail.com";
 const PASSWORD = "Goodfave22@";
@@ -11,21 +9,20 @@ async function main(): Promise<void> {
   const hashedPassword = await bcryptjs.hash(PASSWORD, SALT_ROUNDS);
   const email = EMAIL.toLowerCase();
 
-  const user = await prisma.user.upsert({
+  const user = await db.user.upsert({
     where: { email },
     update: { password: hashedPassword, refreshToken: null },
     create: { email, password: hashedPassword, role: "ADMIN" },
   });
 
-  console.log(`✓ admin credentials set for ${user.email} (id: ${user.id})`);
+  console.log(`admin credentials set for ${user.email} (id: ${user.id})`);
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (error) => {
+  .catch((error) => {
     console.error(error);
-    await prisma.$disconnect();
-    process.exit(1);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await mongoClient.close();
   });

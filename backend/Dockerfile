@@ -14,9 +14,6 @@ COPY dashboard/package.json dashboard/
 COPY email-service/package.json email-service/
 RUN npm ci --workspace=backend
 
-COPY backend/prisma backend/prisma
-RUN npx prisma generate --schema=backend/prisma/schema.prisma
-
 COPY backend/src backend/src
 COPY backend/tsconfig.json backend/
 RUN npm run build --workspace=backend
@@ -32,7 +29,6 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/package.json ./backend/
-COPY --from=builder /app/backend/prisma ./backend/prisma
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
 
 RUN addgroup -g 1001 -S portfolio && \
@@ -49,4 +45,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:${PORT:-4000}/health || exit 1
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["sh", "-c", "npx prisma db push --schema=backend/prisma/schema.prisma --skip-generate --accept-data-loss && node backend/dist/server.js"]
+CMD ["node", "backend/dist/server.js"]

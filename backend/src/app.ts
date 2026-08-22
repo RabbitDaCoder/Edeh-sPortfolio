@@ -76,13 +76,13 @@ export function createApp(): Express {
         )
         .concat(
           blogs.map(
-            (b) =>
+            (b: { slug: string; updatedAt: Date }) =>
               `  <url>\n    <loc>${siteUrl}/blog/${b.slug}</loc>\n    <lastmod>${b.updatedAt.toISOString()}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`,
           ),
         )
         .concat(
           books.map(
-            (b) =>
+            (b: { slug: string; updatedAt: Date }) =>
               `  <url>\n    <loc>${siteUrl}/books/${b.slug}</loc>\n    <lastmod>${b.updatedAt.toISOString()}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`,
           ),
         );
