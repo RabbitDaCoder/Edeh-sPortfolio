@@ -1,30 +1,19 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
-import { logger } from "./utils/logger";
+import { ensureAdminUser } from "./config/admin";
 import { startBackupScheduler, stopBackupScheduler } from "./jobs/backup.job";
-
-// Lazy-load mail worker only when needed — it opens a separate Redis
-// connection that counts against Upstash request limits even when idle.
-let mailWorker: { close: () => Promise<void> } | null = null;
-
-async function initMailWorker() {
-  try {
-    const { mailWorker: worker } = await import("./jobs/mail.job");
-    mailWorker = worker;
-    logger.info("Mail worker initialized");
-  } catch (error) {
-    logger.warn({ error }, "Mail worker failed to start — mail jobs disabled");
-  }
-}
+import { logger } from "./utils/logger";
 
 const app = createApp();
 
 async function startServer(): Promise<void> {
   try {
+    await ensureAdminUser();
+
     app.listen(env.PORT, () => {
       logger.info({ port: env.PORT, env: env.NODE_ENV }, "Server started");
     });
-    await initMailWorker();
+
     startBackupScheduler();
   } catch (error) {
     logger.error({ error }, "Server startup failed");
@@ -32,17 +21,15 @@ async function startServer(): Promise<void> {
   }
 }
 
-process.on("SIGINT", async () => {
+process.on("SIGINT", () => {
   logger.info("Shutting down gracefully");
   stopBackupScheduler();
-  await mailWorker?.close();
   process.exit(0);
 });
 
-process.on("SIGTERM", async () => {
+process.on("SIGTERM", () => {
   logger.info("Shutting down gracefully");
   stopBackupScheduler();
-  await mailWorker?.close();
   process.exit(0);
 });
 

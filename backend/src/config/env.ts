@@ -21,6 +21,7 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
   ADMIN_EMAIL: z.string().email(),
+  ADMIN_PASSWORD: z.string().min(8).optional(),
   EMAIL_SERVICE_URL: z.string().min(1, "EMAIL_SERVICE_URL must be set"),
   EMAIL_SERVICE_API_KEY: z.string().min(1, "EMAIL_SERVICE_API_KEY must be set"),
   CORS_ORIGIN: z
