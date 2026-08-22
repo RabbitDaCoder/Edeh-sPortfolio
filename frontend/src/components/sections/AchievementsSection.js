@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { useAchievements } from "../../features/achievements/hooks/useAchievements";
-import { ACHIEVEMENTS as FALLBACK_ACHIEVEMENTS } from "../../data/portfolio";
 import { Award, Trophy, Zap, BookOpen } from "lucide-react";
 gsap.registerPlugin(ScrollTrigger);
 const ICONS = [Trophy, Zap, Award, BookOpen];
@@ -36,15 +35,13 @@ export const AchievementsSection = () => {
     const progressLineRef = useRef(null);
     const trackRef = useRef(null);
     const { data: raw } = useAchievements();
-    const achievements = (raw ?? []).length
-        ? (raw ?? []).map((a) => ({
-            id: a.id,
-            title: a.title,
-            description: a.description ?? "",
-            date: a.date ?? "",
-            order: a.order ?? 0,
-        }))
-        : FALLBACK_ACHIEVEMENTS;
+    const achievements = (raw ?? []).map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description ?? "",
+        date: a.date ?? "",
+        order: a.order ?? 0,
+    }));
     // Scroll-driven progress line
     useEffect(() => {
         if (!progressLineRef.current || !trackRef.current)

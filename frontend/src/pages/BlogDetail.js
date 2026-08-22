@@ -42,14 +42,28 @@ export const BlogDetailPage = () => {
     const title = post?.title ?? "";
     const excerpt = post?.excerpt ?? "";
     const content = post?.content ?? "";
+    const isMarkdownContent = post?.contentSource === "markdown";
     const category = Array.isArray(post?.tags) && post.tags.length > 0 ? post.tags[0] : "Blog";
     const readTimeStr = post?.readTime
         ? `${post.readTime} min read`
         : "5 min read";
     const dateStr = post?.createdAt ?? post?.date ?? "";
     const author = "Edeh Chinedu Daniel";
-    // Parse ToC from markdown-style headings
     const tocEntries = useMemo(() => {
+        if (isMarkdownContent) {
+            const entries = [];
+            const headingPattern = /<h([23])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi;
+            let match;
+            while ((match = headingPattern.exec(content))) {
+                const text = match[2].replace(/<[^>]+>/g, "").trim();
+                const id = text
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/(^-|-$)/g, "");
+                entries.push({ id, text, level: Number(match[1]) });
+            }
+            return entries;
+        }
         const lines = content.split("\n");
         const entries = [];
         lines.forEach((line) => {
@@ -65,9 +79,18 @@ export const BlogDetailPage = () => {
             }
         });
         return entries;
-    }, [content]);
-    // Render content as basic HTML
+    }, [content, isMarkdownContent]);
     const processedHtml = useMemo(() => {
+        if (isMarkdownContent) {
+            let idIndex = 0;
+            return content.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (_match, level, attributes, heading) => {
+                const entry = tocEntries[idIndex++];
+                if (!entry || /\bid\s*=/.test(attributes)) {
+                    return `<h${level}${attributes}>${heading}</h${level}>`;
+                }
+                return `<h${level}${attributes} id="${entry.id}">${heading}</h${level}>`;
+            });
+        }
         let idIndex = 0;
         const html = content
             .replace(/^### (.+)$/gm, '<h3 id="PLACEHOLDER_ID" class="text-xl font-semibold text-text-primary mt-10 mb-4">$1</h3>')
@@ -78,7 +101,7 @@ export const BlogDetailPage = () => {
             idIndex++;
             return entry ? `id="${entry.id}"` : 'id=""';
         });
-    }, [content, tocEntries]);
+    }, [content, isMarkdownContent, tocEntries]);
     // Intersection observer for active ToC highlight
     useEffect(() => {
         const el = contentRef.current;

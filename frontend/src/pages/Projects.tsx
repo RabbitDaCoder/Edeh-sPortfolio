@@ -5,7 +5,6 @@ import { PageWrapper } from "../components/layout/PageWrapper";
 import { Section } from "../components/layout/Section";
 import { Button } from "../components/ui/Button";
 import { ProjectGridCard } from "../components/projects/ProjectGridCard";
-import { PROJECTS } from "../data/portfolio";
 import { useProjects } from "../features/projects/hooks/useProjects";
 import { useSEO } from "../hooks/useSEO";
 import { SEO } from "../components/seo/SEO";
@@ -13,7 +12,7 @@ import { JsonLD } from "../components/seo/JsonLD";
 import { breadcrumbSchema, collectionPageSchema } from "../lib/schemas";
 
 export const ProjectsPage: React.FC = () => {
-  const { data: allProjects = PROJECTS } = useProjects();
+  const { data: allProjects = [], isLoading, isError } = useProjects();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeFilter = searchParams.get("filter") ?? "all";
 
@@ -92,44 +91,60 @@ export const ProjectsPage: React.FC = () => {
           </div>
 
           {/* Filter tags */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={activeFilter === "all" ? "primary" : "ghost"}
-              size="sm"
-              onClick={() => setFilter("all")}
-            >
-              All
-            </Button>
-            {allTags.map((tag) => (
+          {allTags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
               <Button
-                key={tag}
-                variant={activeFilter === tag ? "primary" : "ghost"}
+                variant={activeFilter === "all" ? "primary" : "ghost"}
                 size="sm"
-                onClick={() => setFilter(tag)}
-                className="capitalize"
+                onClick={() => setFilter("all")}
               >
-                {tag}
+                All
               </Button>
-            ))}
-          </div>
+              {allTags.map((tag) => (
+                <Button
+                  key={tag}
+                  variant={activeFilter === tag ? "primary" : "ghost"}
+                  size="sm"
+                  onClick={() => setFilter(tag)}
+                  className="capitalize"
+                >
+                  {tag}
+                </Button>
+              ))}
+            </div>
+          )}
 
           {/* Projects grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((project, i) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-              >
-                <ProjectGridCard project={project} />
-              </motion.div>
-            ))}
-          </div>
+          {!isLoading && !isError && filtered.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map((project, i) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                >
+                  <ProjectGridCard project={project} />
+                </motion.div>
+              ))}
+            </div>
+          )}
 
-          {filtered.length === 0 && (
+          {isLoading && (
             <p className="text-center text-text-muted py-12">
-              No projects match this filter.
+              Loading projects...
+            </p>
+          )}
+
+          {isError && (
+            <p className="text-center text-text-muted py-12">
+              Projects could not be loaded from the server.
+            </p>
+          )}
+
+          {!isLoading && !isError && filtered.length === 0 && (
+            <p className="text-center text-text-muted py-12">
+              No projects available.
             </p>
           )}
         </div>

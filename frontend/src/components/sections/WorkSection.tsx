@@ -12,16 +12,10 @@ import {
   toProjectData,
   type ProjectData,
 } from "./work/ProjectCard";
-import { PROJECTS, PERSONAL } from "../../data/portfolio";
 import { useFeaturedProjects } from "../../features/projects/hooks/useProjects";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 gsap.registerPlugin(ScrollTrigger);
-
-/** Static fallback for initial render */
-const fallbackProjects: ProjectData[] = PROJECTS.filter((p) => p.featured).map(
-  toProjectData,
-);
 
 /* ═══════════════════════════════════════════════════
    MOBILE CAROUSEL
@@ -91,12 +85,11 @@ function MobileWork({
 
 export const WorkSection: React.FC = () => {
   const { data: featuredRaw = [] } = useFeaturedProjects();
-  const { data: personal = PERSONAL } = useProfile();
-  const projects = featuredRaw.length
-    ? featuredRaw.map(toProjectData)
-    : fallbackProjects;
+  const { data: personal } = useProfile();
+  const projects = featuredRaw.map(toProjectData);
 
   const count = projects.length;
+  if (!count) return null;
 
   // Dynamic refs for N cards
   const cardRefs = useMemo(
@@ -392,14 +385,16 @@ export const WorkSection: React.FC = () => {
           <span className="block font-mono text-label text-text-muted uppercase tracking-widest mb-2">
             All projects on GitHub
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(personal.github, "_blank")}
-          >
-            <ArrowUpRight size={14} strokeWidth={1.5} />
-            View GitHub
-          </Button>
+          {personal?.github && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.open(personal.github, "_blank")}
+            >
+              <ArrowUpRight size={14} strokeWidth={1.5} />
+              View GitHub
+            </Button>
+          )}
         </div>
       </div>
     </div>

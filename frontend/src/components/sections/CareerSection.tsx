@@ -6,7 +6,6 @@ import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useCareerTimeline } from "../../features/career/hooks/useCareer";
-import { EXPERIENCES } from "../../data/portfolio";
 import type { Experience } from "../../data/portfolio";
 import { Briefcase, GraduationCap, Rocket, ChevronRight } from "lucide-react";
 
@@ -151,8 +150,7 @@ export const CareerSection: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const { data: raw } = useCareerTimeline();
 
-  const experiences: Experience[] = (raw ?? []).length
-    ? (raw ?? []).map((e: any) => ({
+  const experiences: Experience[] = (raw ?? []).map((e: any) => ({
         id: e.id,
         type: TYPE_MAP[e.type] ?? "work",
         title: e.title ?? "",
@@ -165,8 +163,7 @@ export const CareerSection: React.FC = () => {
         points: e.points ?? [],
         keySkills: e.keySkills ?? [],
         order: e.order ?? 0,
-      }))
-    : EXPERIENCES;
+  }));
 
   const filtered = experiences.filter(
     (entry) => filter === "all" || entry.type === filter,

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/axios";
-import { TECHNOLOGIES } from "../../../data/portfolio";
 export const useSkillsKey = {
     all: ["skills"],
 };
@@ -20,21 +19,13 @@ export function useSkills() {
     return useQuery({
         queryKey: useSkillsKey.all,
         queryFn: async () => {
-            try {
-                const { data } = await apiClient.get("/skills");
-                const items = data.data;
-                if (!items?.length)
-                    return TECHNOLOGIES;
-                return items.map((s) => ({
-                    name: s.name,
-                    category: CATEGORY_MAP[s.category] ?? "other",
-                }));
-            }
-            catch {
-                return TECHNOLOGIES;
-            }
+            const { data } = await apiClient.get("/skills");
+            const items = data.data ?? [];
+            return items.map((s) => ({
+                name: s.name,
+                category: CATEGORY_MAP[s.category] ?? "other",
+            }));
         },
-        placeholderData: TECHNOLOGIES,
         retry: 1,
     });
 }

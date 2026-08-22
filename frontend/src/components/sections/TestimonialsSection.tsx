@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useEmblaCarousel from "embla-carousel-react";
 import { Section } from "../layout/Section";
 import { Card } from "../ui/Card";
-import { TESTIMONIALS } from "../../data/portfolio";
+import type { Testimonial } from "../../data/portfolio";
 import { useTestimonials } from "../../features/testimonials/hooks/useTestimonials";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -43,7 +43,7 @@ function TestimonialCard({
   );
 }
 
-function MobileTestimonials({ items }: { items: typeof TESTIMONIALS }) {
+function MobileTestimonials({ items }: { items: Testimonial[] }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selected, setSelected] = useState(0);
 
@@ -88,7 +88,7 @@ function MobileTestimonials({ items }: { items: typeof TESTIMONIALS }) {
 }
 
 export const TestimonialsSection: React.FC = () => {
-  const { data: testimonials = TESTIMONIALS } = useTestimonials();
+  const { data: testimonials = [] } = useTestimonials();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -112,6 +112,8 @@ export const TestimonialsSection: React.FC = () => {
 
     return () => ctx.revert();
   }, []);
+
+  if (!testimonials.length) return null;
 
   return (
     <Section id="testimonials">

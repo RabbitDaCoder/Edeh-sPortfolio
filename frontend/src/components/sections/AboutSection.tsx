@@ -2,28 +2,19 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Section } from "../layout/Section";
 import { Card } from "../ui/Card";
-import { Monitor, Globe, Server, Sparkles, Cpu, Users } from "lucide-react";
-import { PERSONAL, SERVICES } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
-const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
-  Monitor,
-  Globe,
-  Server,
-  Sparkles,
-  Cpu,
-  Users,
-};
-
 export const AboutSection: React.FC = () => {
-  const { data: personal = PERSONAL } = useProfile();
+  const { data: personal } = useProfile();
 
-  const bio = personal?.bio ?? PERSONAL.bio;
-  const pullQuote = personal?.pullQuote ?? PERSONAL.pullQuote;
+  if (!personal) return null;
+
+  const bio = personal.bio;
+  const pullQuote = personal.pullQuote;
 
   return (
     <Section id="about" className="bg-surface/30">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+      <div className="grid grid-cols-1 gap-12 items-start">
         {/* Left: Text */}
         <div className="space-y-6">
           <motion.h2
@@ -65,53 +56,7 @@ export const AboutSection: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Right: Stats / highlights */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="grid grid-cols-2 gap-4"
-        >
-          {[
-            { value: "4+", label: "Years of experience" },
-            { value: "20+", label: "Projects delivered" },
-            { value: "5+", label: "Technologies mastered" },
-            { value: "100%", label: "Passion for craft" },
-          ].map((stat) => (
-            <Card key={stat.label} className="p-6 text-center space-y-2">
-              <span className="text-display-md font-serif text-text-primary">
-                {stat.value}
-              </span>
-              <p className="text-xs text-text-muted">{stat.label}</p>
-            </Card>
-          ))}
-        </motion.div>
       </div>
-
-      {/* Services grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-16"
-      >
-        {SERVICES.map((service) => {
-          const Icon = ICON_MAP[service.icon];
-          return (
-            <Card key={service.title} hover="scale" className="p-6 space-y-3">
-              {Icon && <Icon className="w-5 h-5 text-text-muted" />}
-              <h3 className="text-base font-semibold text-text-primary">
-                {service.title}
-              </h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                {service.description}
-              </p>
-            </Card>
-          );
-        })}
-      </motion.div>
     </Section>
   );
 };

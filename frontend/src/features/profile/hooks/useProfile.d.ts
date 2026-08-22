@@ -1,31 +1,25 @@
+export interface Profile {
+    name: string;
+    alias?: string;
+    tagline?: string;
+    subTagline?: string;
+    fullHeadline?: string;
+    bio: string[];
+    pullQuote?: string;
+    availability?: string;
+    email: string;
+    phone?: string;
+    location?: string;
+    locationShort?: string;
+    github?: string;
+    linkedin?: string;
+    youtube?: string;
+    twitter?: string;
+    portfolio?: string;
+    calendly?: string;
+}
 export declare const useProfileKey: {
     all: readonly ["profile"];
 };
-export declare function useProfile(): import("@tanstack/react-query").UseQueryResult<{
-    name: string;
-    alias: any;
-    tagline: any;
-    subTagline: any;
-    fullHeadline: any;
-    bio: readonly [any, any];
-    pullQuote: any;
-    availability: any;
-    email: any;
-    phone: any;
-    location: any;
-    locationShort: any;
-    github: any;
-    linkedin: any;
-    youtube: any;
-    twitter: any;
-    portfolio: any;
-    calendly: any;
-    languages: readonly [{
-        readonly name: "English";
-        readonly level: "Fluent";
-    }, {
-        readonly name: "Igbo";
-        readonly level: "Fluent";
-    }];
-}, Error>;
+export declare function useProfile(): import("@tanstack/react-query").UseQueryResult<Profile | null, Error>;
 //# sourceMappingURL=useProfile.d.ts.map

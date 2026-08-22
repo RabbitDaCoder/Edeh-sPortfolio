@@ -6,14 +6,13 @@ import { PageWrapper } from "../components/layout/PageWrapper";
 import { Section } from "../components/layout/Section";
 import { Button } from "../components/ui/Button";
 import { ProjectGridCard } from "../components/projects/ProjectGridCard";
-import { PROJECTS } from "../data/portfolio";
 import { useProjects } from "../features/projects/hooks/useProjects";
 import { useSEO } from "../hooks/useSEO";
 import { SEO } from "../components/seo/SEO";
 import { JsonLD } from "../components/seo/JsonLD";
 import { breadcrumbSchema, collectionPageSchema } from "../lib/schemas";
 export const ProjectsPage = () => {
-    const { data: allProjects = PROJECTS } = useProjects();
+    const { data: allProjects = [], isLoading, isError } = useProjects();
     const [searchParams, setSearchParams] = useSearchParams();
     const activeFilter = searchParams.get("filter") ?? "all";
     const allTags = useMemo(() => Array.from(new Set(allProjects.flatMap((p) => p.tags))).sort(), [allProjects]);
@@ -58,6 +57,6 @@ export const ProjectsPage = () => {
                         name: p.name,
                         url: `https://edehchinedu.dev/projects`,
                     })),
-                }) }), _jsx(Section, { id: "projects", children: _jsxs("div", { className: "space-y-12", children: [_jsxs("div", { className: "max-w-2xl", children: [_jsx("h1", { className: "text-display-xl font-serif text-text-primary mb-4", children: "All Projects" }), _jsx("p", { className: "text-body-lg text-text-muted", children: "A collection of things I've built \u2014 from production platforms to creative experiments." })] }), _jsxs("div", { className: "flex flex-wrap gap-2", children: [_jsx(Button, { variant: activeFilter === "all" ? "primary" : "ghost", size: "sm", onClick: () => setFilter("all"), children: "All" }), allTags.map((tag) => (_jsx(Button, { variant: activeFilter === tag ? "primary" : "ghost", size: "sm", onClick: () => setFilter(tag), className: "capitalize", children: tag }, tag)))] }), _jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", children: filtered.map((project, i) => (_jsx(motion.div, { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, delay: i * 0.05 }, children: _jsx(ProjectGridCard, { project: project }) }, project.id))) }), filtered.length === 0 && (_jsx("p", { className: "text-center text-text-muted py-12", children: "No projects match this filter." }))] }) })] }));
+                }) }), _jsx(Section, { id: "projects", children: _jsxs("div", { className: "space-y-12", children: [_jsxs("div", { className: "max-w-2xl", children: [_jsx("h1", { className: "text-display-xl font-serif text-text-primary mb-4", children: "All Projects" }), _jsx("p", { className: "text-body-lg text-text-muted", children: "A collection of things I've built \u2014 from production platforms to creative experiments." })] }), allTags.length > 0 && (_jsxs("div", { className: "flex flex-wrap gap-2", children: [_jsx(Button, { variant: activeFilter === "all" ? "primary" : "ghost", size: "sm", onClick: () => setFilter("all"), children: "All" }), allTags.map((tag) => (_jsx(Button, { variant: activeFilter === tag ? "primary" : "ghost", size: "sm", onClick: () => setFilter(tag), className: "capitalize", children: tag }, tag)))] })), !isLoading && !isError && filtered.length > 0 && (_jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", children: filtered.map((project, i) => (_jsx(motion.div, { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, delay: i * 0.05 }, children: _jsx(ProjectGridCard, { project: project }) }, project.id))) })), isLoading && (_jsx("p", { className: "text-center text-text-muted py-12", children: "Loading projects..." })), isError && (_jsx("p", { className: "text-center text-text-muted py-12", children: "Projects could not be loaded from the server." })), !isLoading && !isError && filtered.length === 0 && (_jsx("p", { className: "text-center text-text-muted py-12", children: "No projects available." }))] }) })] }));
 };
 //# sourceMappingURL=Projects.js.map

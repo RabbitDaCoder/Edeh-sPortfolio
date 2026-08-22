@@ -7,7 +7,6 @@ import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { useCareerTimeline } from "../../features/career/hooks/useCareer";
-import { EXPERIENCES } from "../../data/portfolio";
 import { Briefcase, GraduationCap, Rocket, ChevronRight } from "lucide-react";
 gsap.registerPlugin(ScrollTrigger);
 const TYPE_MAP = {
@@ -60,22 +59,20 @@ export const CareerSection = () => {
     const progressLineRef = useRef(null);
     const timelineRef = useRef(null);
     const { data: raw } = useCareerTimeline();
-    const experiences = (raw ?? []).length
-        ? (raw ?? []).map((e) => ({
-            id: e.id,
-            type: TYPE_MAP[e.type] ?? "work",
-            title: e.title ?? "",
-            organisation: e.organisation ?? "",
-            description: e.description ?? "",
-            date: e.date ?? formatPeriod(e.startDate, e.endDate, e.current),
-            startDate: e.startDate ?? "",
-            endDate: e.endDate ?? null,
-            current: e.current ?? false,
-            points: e.points ?? [],
-            keySkills: e.keySkills ?? [],
-            order: e.order ?? 0,
-        }))
-        : EXPERIENCES;
+    const experiences = (raw ?? []).map((e) => ({
+        id: e.id,
+        type: TYPE_MAP[e.type] ?? "work",
+        title: e.title ?? "",
+        organisation: e.organisation ?? "",
+        description: e.description ?? "",
+        date: e.date ?? formatPeriod(e.startDate, e.endDate, e.current),
+        startDate: e.startDate ?? "",
+        endDate: e.endDate ?? null,
+        current: e.current ?? false,
+        points: e.points ?? [],
+        keySkills: e.keySkills ?? [],
+        order: e.order ?? 0,
+    }));
     const filtered = experiences.filter((entry) => filter === "all" || entry.type === filter);
     // Scroll-driven progress line
     useEffect(() => {

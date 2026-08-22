@@ -1,6 +1,7 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
 import { ensureAdminUser } from "./config/admin";
+import { seedDefaultContentIfEmpty } from "./config/seed";
 import { startBackupScheduler, stopBackupScheduler } from "./jobs/backup.job";
 import { logger } from "./utils/logger";
 
@@ -9,6 +10,7 @@ const app = createApp();
 async function startServer(): Promise<void> {
   try {
     await ensureAdminUser();
+    await seedDefaultContentIfEmpty();
 
     app.listen(env.PORT, () => {
       logger.info({ port: env.PORT, env: env.NODE_ENV }, "Server started");

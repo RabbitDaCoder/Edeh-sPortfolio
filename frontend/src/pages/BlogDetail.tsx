@@ -51,6 +51,7 @@ export const BlogDetailPage: React.FC = () => {
   const title = post?.title ?? "";
   const excerpt = post?.excerpt ?? "";
   const content = post?.content ?? "";
+  const isMarkdownContent = post?.contentSource === "markdown";
   const category =
     Array.isArray(post?.tags) && post.tags.length > 0 ? post.tags[0] : "Blog";
   const readTimeStr = post?.readTime
@@ -59,8 +60,23 @@ export const BlogDetailPage: React.FC = () => {
   const dateStr = post?.createdAt ?? post?.date ?? "";
   const author = "Edeh Chinedu Daniel";
 
-  // Parse ToC from markdown-style headings
   const tocEntries = useMemo<TocEntry[]>(() => {
+    if (isMarkdownContent) {
+      const entries: TocEntry[] = [];
+      const headingPattern = /<h([23])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi;
+      let match: RegExpExecArray | null;
+
+      while ((match = headingPattern.exec(content))) {
+        const text = match[2].replace(/<[^>]+>/g, "").trim();
+        const id = text
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+        entries.push({ id, text, level: Number(match[1]) });
+      }
+      return entries;
+    }
+
     const lines = content.split("\n");
     const entries: TocEntry[] = [];
     lines.forEach((line: string) => {
@@ -76,10 +92,28 @@ export const BlogDetailPage: React.FC = () => {
       }
     });
     return entries;
-  }, [content]);
+  }, [content, isMarkdownContent]);
 
-  // Render content as basic HTML
   const processedHtml = useMemo(() => {
+    if (isMarkdownContent) {
+      let idIndex = 0;
+      return content.replace(
+        /<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi,
+        (
+          _match: string,
+          level: string,
+          attributes: string,
+          heading: string,
+        ) => {
+          const entry = tocEntries[idIndex++];
+          if (!entry || /\bid\s*=/.test(attributes)) {
+            return `<h${level}${attributes}>${heading}</h${level}>`;
+          }
+          return `<h${level}${attributes} id="${entry.id}">${heading}</h${level}>`;
+        },
+      );
+    }
+
     let idIndex = 0;
     const html = content
       .replace(
@@ -100,7 +134,7 @@ export const BlogDetailPage: React.FC = () => {
       idIndex++;
       return entry ? `id="${entry.id}"` : 'id=""';
     });
-  }, [content, tocEntries]);
+  }, [content, isMarkdownContent, tocEntries]);
 
   // Intersection observer for active ToC highlight
   useEffect(() => {

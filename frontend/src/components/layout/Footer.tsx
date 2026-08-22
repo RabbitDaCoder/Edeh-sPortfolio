@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Github, Linkedin, Twitter, Mail } from "lucide-react";
-import { PERSONAL } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 export const Footer: React.FC = () => {
-  const { data: personal = PERSONAL } = useProfile();
+  const { data: personal } = useProfile();
   const currentYear = new Date().getFullYear();
+  if (!personal) return null;
   const fullName = personal.name;
 
   const socialLinks = [

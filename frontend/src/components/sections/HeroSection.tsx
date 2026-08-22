@@ -3,11 +3,10 @@ import { motion } from "framer-motion";
 import { Section } from "../layout/Section";
 import { Badge } from "../ui/Badge";
 import { PolaroidCarousel } from "../ui/PolaroidCarousel";
-import { PERSONAL } from "../../data/portfolio";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 export const HeroSection: React.FC = () => {
-  const { data: personal = PERSONAL, isLoading } = useProfile();
+  const { data: personal, isLoading } = useProfile();
   const headlineRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -28,7 +27,9 @@ export const HeroSection: React.FC = () => {
     });
   }, []);
 
-  const displayName = personal?.name ?? PERSONAL.name;
+  if (isLoading || !personal) return null;
+
+  const displayName = personal.name;
 
   return (
     <Section id="hero" className="min-h-screen flex items-center">
@@ -36,7 +37,7 @@ export const HeroSection: React.FC = () => {
         {/* Text content */}
         <div className="space-y-8">
           <Badge variant="pulse" className="text-xs">
-            {personal?.availability ?? PERSONAL.availability}
+            {personal.availability}
           </Badge>
 
           <h1
@@ -61,7 +62,7 @@ export const HeroSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="text-body-lg text-text-muted max-w-lg"
           >
-            {personal?.tagline ?? PERSONAL.tagline}
+            {personal.tagline}
           </motion.p>
         </div>
       </div>

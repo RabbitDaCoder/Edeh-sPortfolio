@@ -6,7 +6,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useEmblaCarousel from "embla-carousel-react";
 import { Section } from "../layout/Section";
 import { Card } from "../ui/Card";
-import { TESTIMONIALS } from "../../data/portfolio";
 import { useTestimonials } from "../../features/testimonials/hooks/useTestimonials";
 gsap.registerPlugin(ScrollTrigger);
 function TestimonialCard({ name, designation, company, quote, initials, }) {
@@ -27,7 +26,7 @@ function MobileTestimonials({ items }) {
     return (_jsxs("div", { children: [_jsx("div", { ref: emblaRef, className: "overflow-hidden", children: _jsx("div", { className: "flex", children: items.map((t) => (_jsx("div", { className: "min-w-0 flex-[0_0_100%] px-2", children: _jsx(TestimonialCard, { name: t.name, designation: t.designation, company: t.company, quote: t.quote, initials: t.initials }) }, t.id))) }) }), _jsx("div", { className: "flex justify-center gap-2 mt-4", children: items.map((_, i) => (_jsx("span", { className: `w-2 h-2 rounded-full transition-colors ${i === selected ? "bg-accent" : "border border-border"}` }, i))) })] }));
 }
 export const TestimonialsSection = () => {
-    const { data: testimonials = TESTIMONIALS } = useTestimonials();
+    const { data: testimonials = [] } = useTestimonials();
     const containerRef = useRef(null);
     useEffect(() => {
         if (!containerRef.current)
@@ -50,6 +49,8 @@ export const TestimonialsSection = () => {
         }, containerRef);
         return () => ctx.revert();
     }, []);
+    if (!testimonials.length)
+        return null;
     return (_jsx(Section, { id: "testimonials", children: _jsxs("div", { className: "space-y-12", children: [_jsx(motion.h2, { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.6 }, className: "text-display-lg font-serif text-text-primary", children: "What People Say" }), _jsx("div", { ref: containerRef, className: "hidden md:grid md:grid-cols-3 gap-6", children: testimonials.map((t) => (_jsx("div", { className: "testimonial-card", children: _jsx(TestimonialCard, { name: t.name, designation: t.designation, company: t.company, quote: t.quote, initials: t.initials }) }, t.id))) }), _jsx("div", { className: "md:hidden", children: _jsx(MobileTestimonials, { items: testimonials }) })] }) }));
 };
 //# sourceMappingURL=TestimonialsSection.js.map

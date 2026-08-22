@@ -11,7 +11,6 @@ import { Textarea } from "../components/ui/Textarea";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
 import { Copy, Check, Send, ArrowRight } from "lucide-react";
-import { PERSONAL } from "../data/portfolio";
 import { useProfile } from "../features/profile/hooks/useProfile";
 import { useSEO } from "../hooks/useSEO";
 import { SEO } from "../components/seo/SEO";
@@ -51,7 +50,7 @@ const BUDGET_RANGES = [
 const TIMELINES = ["ASAP", "1-2 months", "3-6 months", "6+ months", "Flexible"];
 
 export const ContactPage: React.FC = () => {
-  const { data: personal = PERSONAL } = useProfile();
+  const { data: personal, isLoading: isProfileLoading } = useProfile();
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -85,6 +84,7 @@ export const ContactPage: React.FC = () => {
   };
 
   const copyEmail = async () => {
+    if (!personal?.email) return;
     await navigator.clipboard.writeText(personal.email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -309,11 +309,14 @@ export const ContactPage: React.FC = () => {
                         Email
                       </p>
                       <p className="text-sm text-text-primary font-mono">
-                        {personal.email}
+                        {isProfileLoading
+                          ? "Loading..."
+                          : personal?.email || "Unavailable"}
                       </p>
                     </div>
                     <button
                       onClick={copyEmail}
+                      disabled={!personal?.email}
                       className="p-2 text-text-muted hover:text-text-primary transition-colors"
                       title="Copy email"
                     >
@@ -329,7 +332,9 @@ export const ContactPage: React.FC = () => {
                       Location
                     </p>
                     <p className="text-sm text-text-primary">
-                      {personal.location}
+                      {isProfileLoading
+                        ? "Loading..."
+                        : personal?.location || "Unavailable"}
                     </p>
                   </div>
                   <div>

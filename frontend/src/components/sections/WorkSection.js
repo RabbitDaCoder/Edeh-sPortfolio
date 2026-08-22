@@ -8,12 +8,9 @@ import { MousePointer, ArrowUpRight } from "lucide-react";
 import { Button } from "../ui/Button";
 import { useSceneStore } from "../../store/sceneStore";
 import { ProjectCard, MobileProjectCard, toProjectData, } from "./work/ProjectCard";
-import { PROJECTS, PERSONAL } from "../../data/portfolio";
 import { useFeaturedProjects } from "../../features/projects/hooks/useProjects";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 gsap.registerPlugin(ScrollTrigger);
-/** Static fallback for initial render */
-const fallbackProjects = PROJECTS.filter((p) => p.featured).map(toProjectData);
 /* ═══════════════════════════════════════════════════
    MOBILE CAROUSEL
    ═══════════════════════════════════════════════════ */
@@ -41,11 +38,11 @@ function MobileWork({ activeCard, projects, }) {
    ═══════════════════════════════════════════════════ */
 export const WorkSection = () => {
     const { data: featuredRaw = [] } = useFeaturedProjects();
-    const { data: personal = PERSONAL } = useProfile();
-    const projects = featuredRaw.length
-        ? featuredRaw.map(toProjectData)
-        : fallbackProjects;
+    const { data: personal } = useProfile();
+    const projects = featuredRaw.map(toProjectData);
     const count = projects.length;
+    if (!count)
+        return null;
     // Dynamic refs for N cards
     const cardRefs = useMemo(() => Array.from({ length: count }, () => createRef()), [count]);
     const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
@@ -195,6 +192,6 @@ export const WorkSection = () => {
                             duration: 3,
                             repeat: Infinity,
                             repeatDelay: 1,
-                        }, className: "flex flex-col items-center gap-2", children: [_jsx(MousePointer, { size: 14, strokeWidth: 1.5 }), _jsx("span", { className: "font-mono text-label uppercase tracking-widest", children: "Scroll to explore" })] }) }), _jsxs("div", { ref: ctaRef, className: "absolute bottom-12 right-4 md:right-8 lg:right-16 opacity-0 translate-y-[10px]", children: [_jsx("span", { className: "block font-mono text-label text-text-muted uppercase tracking-widest mb-2", children: "All projects on GitHub" }), _jsxs(Button, { variant: "ghost", size: "sm", onClick: () => window.open(personal.github, "_blank"), children: [_jsx(ArrowUpRight, { size: 14, strokeWidth: 1.5 }), "View GitHub"] })] })] }) }));
+                        }, className: "flex flex-col items-center gap-2", children: [_jsx(MousePointer, { size: 14, strokeWidth: 1.5 }), _jsx("span", { className: "font-mono text-label uppercase tracking-widest", children: "Scroll to explore" })] }) }), _jsxs("div", { ref: ctaRef, className: "absolute bottom-12 right-4 md:right-8 lg:right-16 opacity-0 translate-y-[10px]", children: [_jsx("span", { className: "block font-mono text-label text-text-muted uppercase tracking-widest mb-2", children: "All projects on GitHub" }), personal?.github && (_jsxs(Button, { variant: "ghost", size: "sm", onClick: () => window.open(personal.github, "_blank"), children: [_jsx(ArrowUpRight, { size: 14, strokeWidth: 1.5 }), "View GitHub"] }))] })] }) }));
 };
 //# sourceMappingURL=WorkSection.js.map
