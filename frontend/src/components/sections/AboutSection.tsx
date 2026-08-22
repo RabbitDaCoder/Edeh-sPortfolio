@@ -55,7 +55,6 @@ export const AboutSection: React.FC = () => {
             </Card>
           </motion.div>
         </div>
-
       </div>
     </Section>
   );

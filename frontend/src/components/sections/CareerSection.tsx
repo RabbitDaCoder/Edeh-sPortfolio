@@ -151,18 +151,18 @@ export const CareerSection: React.FC = () => {
   const { data: raw } = useCareerTimeline();
 
   const experiences: Experience[] = (raw ?? []).map((e: any) => ({
-        id: e.id,
-        type: TYPE_MAP[e.type] ?? "work",
-        title: e.title ?? "",
-        organisation: e.organisation ?? "",
-        description: e.description ?? "",
-        date: e.date ?? formatPeriod(e.startDate, e.endDate, e.current),
-        startDate: e.startDate ?? "",
-        endDate: e.endDate ?? null,
-        current: e.current ?? false,
-        points: e.points ?? [],
-        keySkills: e.keySkills ?? [],
-        order: e.order ?? 0,
+    id: e.id,
+    type: TYPE_MAP[e.type] ?? "work",
+    title: e.title ?? "",
+    organisation: e.organisation ?? "",
+    description: e.description ?? "",
+    date: e.date ?? formatPeriod(e.startDate, e.endDate, e.current),
+    startDate: e.startDate ?? "",
+    endDate: e.endDate ?? null,
+    current: e.current ?? false,
+    points: e.points ?? [],
+    keySkills: e.keySkills ?? [],
+    order: e.order ?? 0,
   }));
 
   const filtered = experiences.filter(
