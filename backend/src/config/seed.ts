@@ -105,8 +105,7 @@ export async function seedDefaultContentIfEmpty(): Promise<void> {
     restored.downloads = await seedByName(db.download, defaultDownloads);
   if (blogCount === 0)
     restored.blogPosts = await seedBySlug(db.blog, defaultBlogPosts);
-  if (bookCount === 0)
-    restored.books = await seedBySlug(db.book, defaultBooks);
+  if (bookCount === 0) restored.books = await seedBySlug(db.book, defaultBooks);
 
   logger.info(restored, "Default content seeded into empty database");
 }
