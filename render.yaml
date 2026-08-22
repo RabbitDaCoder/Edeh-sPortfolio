@@ -1,5 +1,5 @@
 services:
-  # ─── Web Service (API) ──────────────────────────────────────────
+  # Web Service (API)
   - type: web
     name: portfolio-backend
     runtime: docker
@@ -16,11 +16,9 @@ services:
       - key: PORT
         value: "4000"
       - key: DATABASE_URL
-        sync: false # Supabase pooler URL (port 6543)
-      - key: DIRECT_DATABASE_URL
-        sync: false # Supabase direct URL (port 5432) — needed for migrations
+        sync: false # MongoDB Atlas URL; include database name, e.g. /edeh-portfolioDB
       - key: REDIS_URL
-        sync: false # Manually set — Upstash Redis
+        sync: false # Manually set in Render; Upstash Redis
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_REFRESH_SECRET

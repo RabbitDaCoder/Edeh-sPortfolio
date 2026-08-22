@@ -9,11 +9,10 @@ const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
   PORT: z.string().transform(Number).default("4000"),
-  DATABASE_URL: z.string(),
-  DIRECT_DATABASE_URL: z.string().optional(),
-  REDIS_URL: z.string(),
-  JWT_SECRET: z.string(),
-  JWT_REFRESH_SECRET: z.string(),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL must be set"),
+  REDIS_URL: z.string().min(1, "REDIS_URL must be set"),
+  JWT_SECRET: z.string().min(1, "JWT_SECRET must be set"),
+  JWT_REFRESH_SECRET: z.string().min(1, "JWT_REFRESH_SECRET must be set"),
   JWT_EXPIRES_IN: z.string().default("15m"),
   JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
   SMTP_HOST: z.string().optional(),
@@ -22,13 +21,16 @@ const envSchema = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
   ADMIN_EMAIL: z.string().email(),
-  EMAIL_SERVICE_URL: z.string(),
-  EMAIL_SERVICE_API_KEY: z.string(),
-  CORS_ORIGIN: z.string().transform((val) => val.split(",")),
+  EMAIL_SERVICE_URL: z.string().min(1, "EMAIL_SERVICE_URL must be set"),
+  EMAIL_SERVICE_API_KEY: z.string().min(1, "EMAIL_SERVICE_API_KEY must be set"),
+  CORS_ORIGIN: z
+    .string()
+    .min(1, "CORS_ORIGIN must be set")
+    .transform((val) => val.split(",")),
   BCRYPT_SALT_ROUNDS: z.string().transform(Number).default("12"),
-  CLOUDINARY_CLOUD_NAME: z.string(),
-  CLOUDINARY_API_KEY: z.string(),
-  CLOUDINARY_API_SECRET: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME must be set"),
+  CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY must be set"),
+  CLOUDINARY_API_SECRET: z.string().min(1, "CLOUDINARY_API_SECRET must be set"),
 });
 
 type Env = z.infer<typeof envSchema>;

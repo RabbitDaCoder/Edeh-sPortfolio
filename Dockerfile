@@ -2,7 +2,7 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# System deps for native modules (bcrypt, prisma)
+# System deps for native modules and Prisma
 RUN apk add --no-cache python3 make g++ openssl openssl-dev
 
 # 1. Copy manifests first (maximizes Docker layer cache)
@@ -65,5 +65,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Run migrations + start server
+# Sync MongoDB schema + start server
 CMD ["./docker-entrypoint.sh"]

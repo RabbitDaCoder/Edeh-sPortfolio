@@ -4,7 +4,7 @@ node_modules/
 # Environment variables
 .env
 .env.local
-.production.env
+.env.production
 production.env
 
 # Data exports (contain live credentials/hashes)
