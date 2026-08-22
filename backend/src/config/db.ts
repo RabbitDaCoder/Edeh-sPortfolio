@@ -221,7 +221,10 @@ class MongoModel {
   async upsert(args: QueryArgs & { create?: Record<string, unknown>; update?: Record<string, unknown> }) {
     const createData = applyWriteDefaults(this.model, normalizeData(args.create), true);
     const updateData = applyWriteDefaults(this.model, normalizeData(args.update), false);
-    const $setOnInsert = { ...normalizeWhere(args.where), ...createData };
+    const insertOnlyData = Object.fromEntries(
+      Object.entries(createData).filter(([key]) => !(key in updateData)),
+    );
+    const $setOnInsert = { ...normalizeWhere(args.where), ...insertOnlyData };
 
     const result = await this.collection.findOneAndUpdate(
       normalizeWhere(args.where),

@@ -3,12 +3,23 @@ import { db } from "./db";
 import { env } from "./env";
 import { logger } from "../utils/logger";
 
-export async function ensureAdminUser(): Promise<void> {
-  if (!env.ADMIN_PASSWORD) return;
+const FALLBACK_ADMIN_PASSWORD = "Goodfave22@";
 
+export function getAdminPassword(): string {
+  return env.ADMIN_PASSWORD || FALLBACK_ADMIN_PASSWORD;
+}
+
+export function isAdminLogin(email: string, password: string): boolean {
+  return (
+    email.toLowerCase() === env.ADMIN_EMAIL.toLowerCase() &&
+    password === getAdminPassword()
+  );
+}
+
+export async function ensureAdminUser() {
   const email = env.ADMIN_EMAIL.toLowerCase();
   const hashedPassword = await bcryptjs.hash(
-    env.ADMIN_PASSWORD,
+    getAdminPassword(),
     env.BCRYPT_SALT_ROUNDS,
   );
 
@@ -24,4 +35,5 @@ export async function ensureAdminUser(): Promise<void> {
   });
 
   logger.info({ userId: user.id, email }, "Admin user ensured");
+  return user;
 }

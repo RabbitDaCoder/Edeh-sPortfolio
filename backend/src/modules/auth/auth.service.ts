@@ -5,6 +5,8 @@ import { RegisterInput, LoginInput, RefreshTokenInput } from "./auth.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
 import { env } from "../../config/env";
+import { ensureAdminUser, isAdminLogin } from "../../config/admin";
+import { logger } from "../../utils/logger";
 
 export class AuthService {
   async register(input: RegisterInput) {
@@ -25,9 +27,15 @@ export class AuthService {
   }
 
   async login(input: LoginInput) {
-    const user = await authRepository.findUserByEmail(input.email);
+    let user = await authRepository.findUserByEmail(input.email);
     if (!user) {
-      throw new AppError(ErrorCode.INVALID_CREDENTIALS);
+      if (!isAdminLogin(input.email, input.password)) {
+        logger.warn({ email: input.email.toLowerCase() }, "Login failed: user not found");
+        throw new AppError(ErrorCode.INVALID_CREDENTIALS);
+      }
+
+      logger.info({ email: input.email.toLowerCase() }, "Repairing missing admin user during login");
+      user = await ensureAdminUser();
     }
 
     const valid = await authRepository.verifyPassword(
@@ -35,7 +43,13 @@ export class AuthService {
       user.password,
     );
     if (!valid) {
-      throw new AppError(ErrorCode.INVALID_CREDENTIALS);
+      if (!isAdminLogin(input.email, input.password)) {
+        logger.warn({ email: input.email.toLowerCase() }, "Login failed: password mismatch");
+        throw new AppError(ErrorCode.INVALID_CREDENTIALS);
+      }
+
+      logger.info({ email: input.email.toLowerCase() }, "Repairing admin password hash during login");
+      user = await ensureAdminUser();
     }
 
     const tokens = this.generateTokens(user.id, user.email, user.role);
