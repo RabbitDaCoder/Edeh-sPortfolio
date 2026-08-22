@@ -49,4 +49,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl -f http://localhost:${PORT:-4000}/health || exit 1
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/server.js"]
+CMD ["sh", "-c", "npx prisma db push --schema=backend/prisma/schema.prisma --skip-generate --accept-data-loss && node backend/dist/server.js"]

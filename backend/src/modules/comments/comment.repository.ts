@@ -111,6 +111,14 @@ export class CommentRepository {
   }
 
   async delete(id: string) {
+    // MongoDB self-relations can't cascade at the DB level, so replies
+    // (at any depth) are deleted manually before the comment itself.
+    const replies = await db.comment.findMany({
+      where: { parentId: id },
+      select: { id: true },
+    });
+    await Promise.all(replies.map((reply) => this.delete(reply.id)));
+
     return db.comment.delete({
       where: { id },
     });

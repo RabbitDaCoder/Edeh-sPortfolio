@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -25,7 +24,7 @@ enum TimelineType {
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
   password     String
   role         Role     @default(ADMIN)
@@ -35,7 +34,7 @@ model User {
 }
 
 model Blog {
-  id            String   @id @default(uuid())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   slug          String   @unique
   content       String
@@ -57,7 +56,7 @@ model Blog {
 }
 
 model Article {
-  id         String   @id @default(uuid())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   title      String
   slug       String   @unique
   content    String
@@ -72,12 +71,12 @@ model Article {
 }
 
 model Book {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String   @unique
   description String
   coverImage  String?
-  price       Decimal
+  price       Float
   fileUrl     String?
   published   Boolean  @default(false)
   featured    Boolean  @default(false)
@@ -86,7 +85,7 @@ model Book {
 }
 
 model CareerTimeline {
-  id           String       @id @default(uuid())
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   type         TimelineType
   title        String
   organisation String?
@@ -103,7 +102,7 @@ model CareerTimeline {
 }
 
 model Achievement {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
   date        String?
@@ -112,7 +111,7 @@ model Achievement {
 }
 
 model Download {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   label       String
   fileUrl     String
   publicId    String?
@@ -126,13 +125,13 @@ model Download {
 }
 
 model NewsletterSubscriber {
-  id           String   @id @default(uuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
   subscribedAt DateTime @default(now())
 }
 
 model ContactMessage {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String
   subject   String?
@@ -142,7 +141,7 @@ model ContactMessage {
 }
 
 model Project {
-  id              String   @id @default(uuid())
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   slug            String   @unique
   description     String
@@ -175,7 +174,7 @@ enum TechCategory {
 }
 
 model Skill {
-  id        String       @id @default(uuid())
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   category  TechCategory
   order     Int          @default(0)
@@ -184,7 +183,7 @@ model Skill {
 }
 
 model Testimonial {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   role        String
   designation String?
@@ -198,7 +197,7 @@ model Testimonial {
 }
 
 model SiteProfile {
-  id            String   @id @default(uuid())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName     String
   middleName    String?
   lastName      String
@@ -225,7 +224,7 @@ model SiteProfile {
 }
 
 model Polaroid {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   src       String   @default("")
   alt       String
   caption   String
@@ -237,15 +236,15 @@ model Polaroid {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  blogId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  blogId    String   @db.ObjectId
   blog      Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
   name      String
   email     String
   website   String?
-  body      String   @db.Text
-  parentId  String?
-  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  body      String
+  parentId  String?  @db.ObjectId
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   replies   Comment[] @relation("CommentReplies")
   approved  Boolean  @default(false)
   spam      Boolean  @default(false)
@@ -261,11 +260,11 @@ model Comment {
 }
 
 model GuestbookEntry {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String
-  message   String   @db.VarChar(280)
-  handle    String?  @db.VarChar(80)
+  message   String
+  handle    String?
   approved  Boolean  @default(false)
   pinned    Boolean  @default(false)
   flagged   Boolean  @default(false)
@@ -281,7 +280,7 @@ model GuestbookEntry {
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
 
   type      String   // "guestbook_entry" | "blog_comment" | "blog_reply"
   title     String
@@ -290,8 +289,8 @@ model Notification {
 
   read      Boolean  @default(false)
 
-  guestbookEntryId String?
-  commentId        String?
+  guestbookEntryId String?  @db.ObjectId
+  commentId        String?  @db.ObjectId
 
   createdAt DateTime @default(now())
 

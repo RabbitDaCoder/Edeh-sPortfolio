@@ -5,7 +5,10 @@ export const createCommentSchema = z.object({
   email: z.string().email(),
   website: z.string().url().optional().or(z.literal("")),
   body: z.string().min(3).max(2000),
-  parentId: z.string().uuid().optional(),
+  parentId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid parent comment id")
+    .optional(),
 });
 
 export const getCommentsQuerySchema = z.object({

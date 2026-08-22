@@ -4,6 +4,10 @@ node_modules/
 # Environment variables
 .env
 .env.local
+production.env
+
+# Data exports (contain live credentials/hashes)
+scripts/*.json
 
 # Build output
 dist/
