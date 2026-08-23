@@ -806,7 +806,7 @@ export const ACHIEVEMENTS = [
 export const CV = {
     headline: "Full-Stack Software Engineer | PERN Stack | React & TypeScript | " +
         "DevOps | Blockchain (Cairo / Starknet) | IoT",
-    label: "Curriculum Vitae",
+    label: "CV / Resume",
     version: "v3.0",
     lastUpdated: "March 2026",
     filename: "Edehs-Resume.pdf",

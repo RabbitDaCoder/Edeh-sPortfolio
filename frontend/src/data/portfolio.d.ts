@@ -141,7 +141,7 @@ export type Achievement = {
 export declare const ACHIEVEMENTS: Achievement[];
 export declare const CV: {
     readonly headline: string;
-    readonly label: "Curriculum Vitae";
+    readonly label: "CV / Resume";
     readonly version: "v3.0";
     readonly lastUpdated: "March 2026";
     readonly filename: "Edehs-Resume.pdf";
