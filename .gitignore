@@ -3,6 +3,16 @@ node_modules/
 
 # Environment variables
 .env
+.env.*
+!.env.example
+backend/.env*
+!backend/.env.example
+dashboard/.env*
+!dashboard/.env.example
+frontend/.env*
+!frontend/.env.example
+email-service/.env*
+!email-service/.env.example
 .env.local
 .env.*.local
 

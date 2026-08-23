@@ -52,7 +52,7 @@ function AchievementMilestone({
           <div className="flex items-center justify-between mb-3">
             <Badge
               variant="outline"
-              className="text-[10px] font-mono tracking-wider"
+              className="relative z-10 text-[10px] font-mono tracking-wider"
             >
               {formatDate(achievement.date)}
             </Badge>
