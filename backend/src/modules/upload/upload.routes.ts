@@ -16,10 +16,14 @@ router.post(
     upload.single("image")(req, res, (err) => {
       if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
         return next(
-          new AppError(ErrorCode.VALIDATION_ERROR, "File size must not exceed 100 MB."),
+          new AppError(
+            ErrorCode.VALIDATION_ERROR,
+            "File size must not exceed 100 MB.",
+          ),
         );
       }
-      if (err) return next(new AppError(ErrorCode.VALIDATION_ERROR, err.message));
+      if (err)
+        return next(new AppError(ErrorCode.VALIDATION_ERROR, err.message));
       next();
     });
   },
