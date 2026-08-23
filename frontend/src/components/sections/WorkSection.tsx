@@ -12,7 +12,7 @@ import {
   toProjectData,
   type ProjectData,
 } from "./work/ProjectCard";
-import { useFeaturedProjects } from "../../features/projects/hooks/useProjects";
+import { useProjects } from "../../features/projects/hooks/useProjects";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -84,12 +84,11 @@ function MobileWork({
    ═══════════════════════════════════════════════════ */
 
 export const WorkSection: React.FC = () => {
-  const { data: featuredRaw = [] } = useFeaturedProjects();
+  const { data: projectsRaw = [] } = useProjects();
   const { data: personal } = useProfile();
-  const projects = featuredRaw.map(toProjectData);
+  const projects = projectsRaw.map(toProjectData);
 
   const count = projects.length;
-  if (!count) return null;
 
   // Dynamic refs for N cards
   const cardRefs = useMemo(
@@ -261,6 +260,8 @@ export const WorkSection: React.FC = () => {
 
     return () => ctx.revert();
   }, [isMobile, count, cardRefs]);
+
+  if (!count) return null;
 
   if (isMobile)
     return <MobileWork activeCard={activeCard} projects={projects} />;

@@ -57,7 +57,7 @@ function AchievementMilestone({
               variant="outline"
               className="text-[10px] font-mono tracking-wider"
             >
-              {achievement.date}
+              {formatDate(achievement.date)}
             </Badge>
           </div>
 
@@ -113,7 +113,11 @@ function AchievementMilestone({
 
 function formatDate(d?: string): string {
   if (!d) return "";
-  return new Date(d).toLocaleDateString("en-US", {
+  if (/^\d{4}$/.test(d)) return d;
+  const normalized = d.replace(/\.(\d{3})\d+Z$/, ".$1Z");
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return d;
+  return date.toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
   });

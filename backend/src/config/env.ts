@@ -29,9 +29,13 @@ const envSchema = z.object({
     .min(1, "CORS_ORIGIN must be set")
     .transform((val) => val.split(",")),
   BCRYPT_SALT_ROUNDS: z.string().transform(Number).default("12"),
-  CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME must be set"),
-  CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY must be set"),
-  CLOUDINARY_API_SECRET: z.string().min(1, "CLOUDINARY_API_SECRET must be set"),
+  R2_ACCOUNT_ID: z.string().min(1, "R2_ACCOUNT_ID must be set"),
+  R2_ACCESS_KEY_ID: z.string().min(1, "R2_ACCESS_KEY_ID must be set"),
+  R2_SECRET_ACCESS_KEY: z.string().min(1, "R2_SECRET_ACCESS_KEY must be set"),
+  R2_BUCKET_NAME: z.string().min(1, "R2_BUCKET_NAME must be set"),
+  R2_ENDPOINT: z.string().url("R2_ENDPOINT must be a URL"),
+  R2_PUBLIC_URL: z.string().url("R2_PUBLIC_URL must be a URL"),
+  R2_REGION: z.string().default("auto"),
 });
 
 type Env = z.infer<typeof envSchema>;

@@ -54,15 +54,23 @@ function toObjectId(value: unknown): unknown {
 function normalizeValue(field: string, value: unknown): unknown {
   if (value === undefined) return undefined;
 
-  if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date)) {
+  if (
+    value &&
+    typeof value === "object" &&
+    !Array.isArray(value) &&
+    !(value instanceof Date)
+  ) {
     const operators = value as Record<string, unknown>;
     const normalized: Record<string, unknown> = {};
 
-    if ("not" in operators) normalized.$ne = normalizeValue(field, operators.not);
+    if ("not" in operators)
+      normalized.$ne = normalizeValue(field, operators.not);
     if ("gt" in operators) normalized.$gt = normalizeValue(field, operators.gt);
-    if ("gte" in operators) normalized.$gte = normalizeValue(field, operators.gte);
+    if ("gte" in operators)
+      normalized.$gte = normalizeValue(field, operators.gte);
     if ("lt" in operators) normalized.$lt = normalizeValue(field, operators.lt);
-    if ("lte" in operators) normalized.$lte = normalizeValue(field, operators.lte);
+    if ("lte" in operators)
+      normalized.$lte = normalizeValue(field, operators.lte);
     if ("in" in operators) {
       normalized.$in = Array.isArray(operators.in)
         ? operators.in.map((item) => normalizeValue(field, item))
@@ -76,7 +84,9 @@ function normalizeValue(field: string, value: unknown): unknown {
   return value;
 }
 
-function normalizeWhere(where: Record<string, unknown> = {}): Record<string, unknown> {
+function normalizeWhere(
+  where: Record<string, unknown> = {},
+): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(where)
       .map(([key, value]) => {
@@ -87,7 +97,9 @@ function normalizeWhere(where: Record<string, unknown> = {}): Record<string, unk
   );
 }
 
-function normalizeData(data: Record<string, unknown> = {}): Record<string, unknown> {
+function normalizeData(
+  data: Record<string, unknown> = {},
+): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(data)
       .map(([key, value]) => [key, normalizeValue(key, value)])
@@ -95,7 +107,9 @@ function normalizeData(data: Record<string, unknown> = {}): Record<string, unkno
   );
 }
 
-function projectionFromSelect(select?: Record<string, boolean>): Record<string, 0 | 1> | undefined {
+function projectionFromSelect(
+  select?: Record<string, boolean>,
+): Record<string, 0 | 1> | undefined {
   if (!select) return undefined;
 
   const projection: Record<string, 0 | 1> = {};
@@ -117,7 +131,9 @@ function sortFromOrderBy(orderBy?: QueryArgs["orderBy"]): Sort | undefined {
   }, {});
 }
 
-function serializeDocument<T = Record<string, unknown>>(doc: Document | null): T | null {
+function serializeDocument<T = Record<string, unknown>>(
+  doc: Document | null,
+): T | null {
   if (!doc) return null;
 
   const { _id, ...rest } = doc;
@@ -133,17 +149,28 @@ function serializeDocument<T = Record<string, unknown>>(doc: Document | null): T
   return serialized as T;
 }
 
-function applyWriteDefaults(model: string, data: Record<string, unknown>, isCreate: boolean) {
+function applyWriteDefaults(
+  model: string,
+  data: Record<string, unknown>,
+  isCreate: boolean,
+) {
   const now = new Date();
   const next = { ...data };
 
   if (isCreate && next.createdAt === undefined) next.createdAt = now;
-  if (model !== "achievement" && next.updatedAt === undefined) next.updatedAt = now;
-  if (model === "newsletterSubscriber" && isCreate && next.subscribedAt === undefined) {
+  if (model !== "achievement" && next.updatedAt === undefined)
+    next.updatedAt = now;
+  if (
+    model === "newsletterSubscriber" &&
+    isCreate &&
+    next.subscribedAt === undefined
+  ) {
     next.subscribedAt = now;
   }
-  if (model === "contactMessage" && isCreate && next.read === undefined) next.read = false;
-  if (model === "notification" && isCreate && next.read === undefined) next.read = false;
+  if (model === "contactMessage" && isCreate && next.read === undefined)
+    next.read = false;
+  if (model === "notification" && isCreate && next.read === undefined)
+    next.read = false;
 
   return next;
 }
@@ -192,42 +219,74 @@ class MongoModel {
   }
 
   async update(args: QueryArgs) {
-    const data = applyWriteDefaults(this.model, normalizeData(args.data), false);
+    const data = applyWriteDefaults(
+      this.model,
+      normalizeData(args.data),
+      false,
+    );
     const $inc = this.extractIncrements(data);
-    const $set = Object.fromEntries(Object.entries(data).filter(([, value]) => !this.isIncrement(value)));
+    const $set = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => !this.isIncrement(value)),
+    );
 
     const update: Record<string, unknown> = {};
     if (Object.keys($set).length) update.$set = $set;
     if (Object.keys($inc).length) update.$inc = $inc;
 
-    const result = await this.collection.findOneAndUpdate(normalizeWhere(args.where), update, {
-      returnDocument: "after",
-      projection: projectionFromSelect(args.select),
-    });
+    const result = await this.collection.findOneAndUpdate(
+      normalizeWhere(args.where),
+      update,
+      {
+        returnDocument: "after",
+        projection: projectionFromSelect(args.select),
+      },
+    );
 
     return serializeDocument(result);
   }
 
   async updateMany(args: QueryArgs) {
-    const data = applyWriteDefaults(this.model, normalizeData(args.data), false);
-    return this.collection.updateMany(normalizeWhere(args.where), { $set: data });
+    const data = applyWriteDefaults(
+      this.model,
+      normalizeData(args.data),
+      false,
+    );
+    return this.collection.updateMany(normalizeWhere(args.where), {
+      $set: data,
+    });
   }
 
   async delete(args: QueryArgs) {
-    const doc = await this.collection.findOneAndDelete(normalizeWhere(args.where));
+    const doc = await this.collection.findOneAndDelete(
+      normalizeWhere(args.where),
+    );
     return serializeDocument(doc);
   }
 
-  async upsert(args: QueryArgs & { create?: Record<string, unknown>; update?: Record<string, unknown> }) {
-    const createData = applyWriteDefaults(this.model, normalizeData(args.create), true);
-    const updateData = applyWriteDefaults(this.model, normalizeData(args.update), false);
+  async upsert(
+    args: QueryArgs & {
+      create?: Record<string, unknown>;
+      update?: Record<string, unknown>;
+    },
+  ) {
+    const createData = applyWriteDefaults(
+      this.model,
+      normalizeData(args.create),
+      true,
+    );
+    const where = normalizeWhere(args.where);
+    const updateData = Object.fromEntries(
+      Object.entries(
+        applyWriteDefaults(this.model, normalizeData(args.update), false),
+      ).filter(([key]) => !(key in where)),
+    );
     const insertOnlyData = Object.fromEntries(
       Object.entries(createData).filter(([key]) => !(key in updateData)),
     );
-    const $setOnInsert = { ...normalizeWhere(args.where), ...insertOnlyData };
+    const $setOnInsert = { ...where, ...insertOnlyData };
 
     const result = await this.collection.findOneAndUpdate(
-      normalizeWhere(args.where),
+      where,
       { $set: updateData, $setOnInsert },
       { upsert: true, returnDocument: "after" },
     );
@@ -236,20 +295,29 @@ class MongoModel {
   }
 
   private isIncrement(value: unknown): boolean {
-    return Boolean(value && typeof value === "object" && "increment" in (value as Record<string, unknown>));
+    return Boolean(
+      value &&
+      typeof value === "object" &&
+      "increment" in (value as Record<string, unknown>),
+    );
   }
 
   private extractIncrements(data: Record<string, unknown>) {
     const increments: Record<string, number> = {};
     for (const [field, value] of Object.entries(data)) {
       if (this.isIncrement(value)) {
-        increments[field] = Number((value as Record<string, unknown>).increment);
+        increments[field] = Number(
+          (value as Record<string, unknown>).increment,
+        );
       }
     }
     return increments;
   }
 
-  private async applyIncludes(docs: Array<Record<string, unknown> | null>, include?: Record<string, unknown>) {
+  private async applyIncludes(
+    docs: Array<Record<string, unknown> | null>,
+    include?: Record<string, unknown>,
+  ) {
     const rows = docs.filter(Boolean) as Array<Record<string, unknown>>;
     if (!include || rows.length === 0) return rows;
 
@@ -289,7 +357,10 @@ function createDb() {
   return Object.fromEntries(
     Object.entries(collectionNames).map(([model, collectionName]) => [
       model,
-      new MongoModel(model as keyof typeof collectionNames, database.collection(collectionName)),
+      new MongoModel(
+        model as keyof typeof collectionNames,
+        database.collection(collectionName),
+      ),
     ]),
   ) as Record<keyof typeof collectionNames, MongoModel>;
 }

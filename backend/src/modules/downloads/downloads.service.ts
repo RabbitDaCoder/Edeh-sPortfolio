@@ -1,6 +1,6 @@
 import { downloadRepository } from "./downloads.repository";
 import { cacheService } from "../../services/cache.service";
-import { cloudinaryService } from "../../services/cloudinary.service";
+import { deleteFile, uploadFile } from "../../storage/storage";
 import { CreateDownloadInput, UpdateDownloadInput } from "./downloads.schema";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
@@ -28,15 +28,9 @@ export class DownloadService {
     let publicId: string | undefined;
 
     if (file) {
-      // Include original filename so Cloudinary preserves the extension for raw files
-      const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const result = await cloudinaryService.upload(file.buffer, {
-        folder: "portfolio/downloads",
-        resourceType: "raw",
-        publicId: safeName,
-      });
+      const result = await uploadFile(file, "documents");
       fileUrl = result.url;
-      publicId = result.publicId;
+      publicId = result.key;
     }
 
     if (!fileUrl) {
@@ -64,17 +58,10 @@ export class DownloadService {
     let publicId = download.publicId;
 
     if (file) {
-      if (download.publicId) {
-        await cloudinaryService.destroy(download.publicId).catch(() => {});
-      }
-      const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const result = await cloudinaryService.upload(file.buffer, {
-        folder: "portfolio/downloads",
-        resourceType: "raw",
-        publicId: safeName,
-      });
+      await deleteFile(download.publicId).catch(() => {});
+      const result = await uploadFile(file, "documents");
       fileUrl = result.url;
-      publicId = result.publicId;
+      publicId = result.key;
     }
 
     const updated = await downloadRepository.update(id, {
@@ -91,7 +78,7 @@ export class DownloadService {
     if (!download) throw new AppError(ErrorCode.DOWNLOAD_NOT_FOUND);
 
     if (download.publicId) {
-      await cloudinaryService.destroy(download.publicId).catch(() => {});
+      await deleteFile(download.publicId);
     }
 
     await downloadRepository.delete(id);

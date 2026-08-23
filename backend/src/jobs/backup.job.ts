@@ -1,6 +1,6 @@
 import { createBackup } from "../modules/backup/backup.service";
 import { logger } from "../utils/logger";
-import { cloudinary } from "../config/cloudinary";
+import { pruneBackups, uploadJson } from "../storage/storage";
 
 const BACKUP_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const MAX_BACKUPS = 7; // keep last 7 days
@@ -9,63 +9,20 @@ let startupTimer: ReturnType<typeof setTimeout> | null = null;
 let timer: ReturnType<typeof setInterval> | null = null;
 
 /**
- * Upload a JSON backup to Cloudinary as a raw file.
+ * Upload a JSON backup to R2.
  */
-async function uploadBackupToCloudinary(data: object): Promise<string> {
-  const json = JSON.stringify(data);
-  const base64 = Buffer.from(json).toString("base64");
-  const dataUri = `data:application/json;base64,${base64}`;
+async function uploadBackupToR2(data: object): Promise<string> {
   const timestamp = new Date().toISOString().slice(0, 10);
-
-  const result = await cloudinary.uploader.upload(dataUri, {
-    resource_type: "raw",
-    folder: "portfolio-backups",
-    public_id: `backup-${timestamp}`,
-    overwrite: true,
-  });
-
-  return result.secure_url;
-}
-
-/**
- * Clean up old backups beyond MAX_BACKUPS.
- */
-async function pruneOldBackups(): Promise<void> {
-  try {
-    const { resources } = await cloudinary.api.resources({
-      type: "upload",
-      resource_type: "raw",
-      prefix: "portfolio-backups/",
-      max_results: 50,
-    });
-
-    if (resources.length <= MAX_BACKUPS) return;
-
-    // Sort oldest first
-    const sorted = resources.sort(
-      (a: any, b: any) =>
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-    );
-
-    const toDelete = sorted.slice(0, sorted.length - MAX_BACKUPS);
-    for (const res of toDelete) {
-      await cloudinary.uploader.destroy(res.public_id, {
-        resource_type: "raw",
-      });
-      logger.info({ publicId: res.public_id }, "Pruned old backup");
-    }
-  } catch (err) {
-    logger.warn(err, "Failed to prune old backups");
-  }
+  return uploadJson(data, `backup-${timestamp}.json`);
 }
 
 async function runBackup(): Promise<void> {
   try {
     logger.info("Starting scheduled database backup...");
     const backup = await createBackup();
-    const url = await uploadBackupToCloudinary(backup);
-    logger.info({ url }, "Scheduled backup uploaded to Cloudinary");
-    await pruneOldBackups();
+    const url = await uploadBackupToR2(backup);
+    logger.info({ url }, "Scheduled backup uploaded to R2");
+    await pruneBackups(MAX_BACKUPS);
   } catch (err) {
     logger.error(err, "Scheduled backup failed");
   }

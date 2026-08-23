@@ -2,9 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { downloadService } from "./downloads.service";
 import { success } from "../../utils/apiResponse";
 import { createDownloadSchema, updateDownloadSchema } from "./downloads.schema";
-import { cloudinary } from "../../config/cloudinary";
-import { logger } from "../../utils/logger";
-import axios from "axios";
 
 export async function getDownloads(
   req: Request,
@@ -137,66 +134,10 @@ export async function serveDownload(
       ? filename
       : `${filename}.pdf`;
 
-    // For Cloudinary resources, proxy the file through the backend.
-    // Signed delivery is enabled, so we need to generate signed URLs.
-    if (download.fileUrl.includes("cloudinary.com") && download.publicId) {
-      try {
-        // Use Admin API to get the resource details (confirms it exists and gets fresh URL)
-        const resource = await cloudinary.api.resource(download.publicId, {
-          resource_type: "raw",
-          type: "upload",
-        });
-
-        // Generate a signed URL — this bypasses strict transformations / signed delivery
-        const signedUrl = cloudinary.url(resource.public_id, {
-          resource_type: "raw",
-          sign_url: true,
-          type: "upload",
-          secure: true,
-          version: resource.version,
-        });
-
-        logger.info(
-          { signedUrl, publicId: resource.public_id },
-          "Proxying download via signed URL",
-        );
-
-        const upstream = await axios.get(signedUrl, {
-          responseType: "stream",
-          timeout: 30000,
-        });
-
-        res.setHeader(
-          "Content-Disposition",
-          `attachment; filename="${encodeURIComponent(safeFilename)}"`,
-        );
-        res.setHeader(
-          "Content-Type",
-          upstream.headers["content-type"] || "application/octet-stream",
-        );
-        if (upstream.headers["content-length"]) {
-          res.setHeader("Content-Length", upstream.headers["content-length"]);
-        }
-
-        upstream.data.pipe(res);
-        return;
-      } catch (err: any) {
-        logger.error(
-          {
-            publicId: download.publicId,
-            status: err?.response?.status,
-            message: err?.message,
-          },
-          "Cloudinary download proxy failed",
-        );
-
-        // Last resort: redirect to stored URL (may fail with 401 but worth trying)
-        res.redirect(download.fileUrl);
-        return;
-      }
-    }
-
-    // Non-Cloudinary URLs: redirect directly
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(safeFilename)}"`,
+    );
     res.redirect(download.fileUrl);
   } catch (err) {
     next(err);
