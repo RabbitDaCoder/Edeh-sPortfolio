@@ -5,7 +5,6 @@ import { MEDIA_FOLDERS, uploadFile } from "../../storage/storage";
 import { success } from "../../utils/apiResponse";
 import { AppError } from "../../middleware/errorHandler";
 import { ErrorCode } from "../../utils/errorCodes";
-import multer from "multer";
 
 const router = Router();
 
@@ -14,14 +13,6 @@ router.post(
   authMiddleware,
   (req, res, next) => {
     upload.single("image")(req, res, (err) => {
-      if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
-        return next(
-          new AppError(
-            ErrorCode.VALIDATION_ERROR,
-            "File size must not exceed 100 MB.",
-          ),
-        );
-      }
       if (err)
         return next(new AppError(ErrorCode.VALIDATION_ERROR, err.message));
       next();

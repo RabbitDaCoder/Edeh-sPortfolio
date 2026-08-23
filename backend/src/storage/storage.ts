@@ -8,7 +8,6 @@ import path from "path";
 import { lookup } from "mime-types";
 import { R2_BUCKET_NAME, R2_PUBLIC_URL, r2Client } from "./providers/r2";
 
-export const MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024;
 export const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/jpg",
@@ -67,9 +66,6 @@ export async function uploadFile(
 ): Promise<UploadedFile> {
   if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
     throw new Error("Unsupported file type. Use JPEG, PNG, WebP, GIF, or PDF.");
-  }
-  if (file.size > MAX_FILE_SIZE_BYTES) {
-    throw new Error("File size must not exceed 100 MB.");
   }
 
   const key = generateUniqueFilename(file, folder);

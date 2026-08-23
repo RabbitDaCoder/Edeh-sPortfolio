@@ -27,17 +27,15 @@ export function ImageUploadField({
       setUploadError("Please select an image file");
       return;
     }
-    if (file.size > 100 * 1024 * 1024) {
-      setUploadError("Image size must not exceed 100 MB");
-      return;
-    }
     setUploadError("");
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("image", file);
       formData.append("folder", folder);
-      const res = await apiClient.post("upload/image", formData);
+      const res = await apiClient.post("upload/image", formData, {
+        timeout: 0,
+      });
       const url = res.data?.data?.url;
       if (url) onChange(url);
     } catch (uploadFailure: any) {
