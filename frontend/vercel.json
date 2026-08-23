@@ -12,7 +12,18 @@
     },
     {
       "src": "/sitemap.xml",
-      "dest": "/sitemap.xml"
+      "dest": "https://portfolio-endpoint-zhdj.onrender.com/sitemap.xml"
+    },
+    {
+      "src": "/blog/(?<slug>[^/]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i)(bot|crawl|spider|slurp|facebookexternalhit|whatsapp|embedly|quora|iframely|w3c_validator|ia_archiver|preview)"
+        }
+      ],
+      "dest": "/api/render-blog?slug=$slug"
     },
     {
       "src": "/robots.txt",

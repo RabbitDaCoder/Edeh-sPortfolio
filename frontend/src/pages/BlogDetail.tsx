@@ -164,6 +164,7 @@ export const BlogDetailPage: React.FC = () => {
     ogType: "article",
     ogTitle: title,
     ogDescription: excerpt,
+    ogImage: post?.coverImage,
     publishedTime: dateStr,
     author,
     section: category,

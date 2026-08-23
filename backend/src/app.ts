@@ -46,7 +46,7 @@ export function createApp(): Express {
   // Dynamic sitemap.xml
   app.get("/sitemap.xml", async (req: Request, res: Response) => {
     try {
-      const siteUrl = env.CORS_ORIGIN || "https://edehchinedu.dev";
+      const siteUrl = "https://edehchinedu.dev";
 
       const [blogs, books] = await Promise.all([
         db.blog.findMany({
