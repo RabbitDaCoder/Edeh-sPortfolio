@@ -7,6 +7,9 @@ export const upload = multer({
   storage,
   limits: { fileSize: MAX_FILE_SIZE_BYTES },
   fileFilter: (_req, file, callback) => {
-    callback(null, ALLOWED_MIME_TYPES.has(file.mimetype));
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return callback(new Error("Unsupported file type. Use JPEG, PNG, WebP, or GIF."));
+    }
+    callback(null, true);
   },
 });

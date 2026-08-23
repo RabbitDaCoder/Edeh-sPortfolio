@@ -7,6 +7,7 @@ interface ImageUploadFieldProps {
   onChange: (url: string) => void;
   label?: string;
   error?: string;
+  folder?: string;
 }
 
 export function ImageUploadField({
@@ -14,6 +15,7 @@ export function ImageUploadField({
   onChange,
   label = "Cover Image",
   error,
+  folder = "images",
 }: ImageUploadFieldProps) {
   const [mode, setMode] = useState<"url" | "upload">(value ? "url" : "upload");
   const [uploading, setUploading] = useState(false);
@@ -25,18 +27,24 @@ export function ImageUploadField({
       setUploadError("Please select an image file");
       return;
     }
+    if (file.size > 100 * 1024 * 1024) {
+      setUploadError("Image size must not exceed 100 MB");
+      return;
+    }
     setUploadError("");
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("image", file);
-      const res = await apiClient.post("upload/image", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      formData.append("folder", folder);
+      const res = await apiClient.post("upload/image", formData);
       const url = res.data?.data?.url;
       if (url) onChange(url);
-    } catch {
-      setUploadError("Upload failed. Try again or use a URL instead.");
+    } catch (uploadFailure: any) {
+      setUploadError(
+        uploadFailure.response?.data?.error?.message ||
+          "Upload failed. Try again or use a URL instead.",
+      );
     } finally {
       setUploading(false);
     }

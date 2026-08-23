@@ -21,6 +21,7 @@ export const ALLOWED_MIME_TYPES = new Set([
 const PORTFOLIO_PREFIX = "edeh-portfolio";
 export const MEDIA_FOLDERS = new Set([
   "images",
+  "polaroids",
   "rooms",
   "receipts",
   "documents",

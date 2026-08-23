@@ -216,6 +216,7 @@ function PolaroidFormModal({
         >
           <ImageUploadField
             label="Photo"
+            folder="polaroids"
             value={watch("src") || ""}
             onChange={(url) => setValue("src", url)}
           />

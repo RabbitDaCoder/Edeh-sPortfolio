@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useRef } from "react";
 import { Upload, X, Link as LinkIcon } from "lucide-react";
 import { apiClient } from "../lib/axios";
-export function ImageUploadField({ value, onChange, label = "Cover Image", error, }) {
+export function ImageUploadField({ value, onChange, label = "Cover Image", error, folder = "images", }) {
     const [mode, setMode] = useState(value ? "url" : "upload");
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
@@ -12,20 +12,24 @@ export function ImageUploadField({ value, onChange, label = "Cover Image", error
             setUploadError("Please select an image file");
             return;
         }
+        if (file.size > 100 * 1024 * 1024) {
+            setUploadError("Image size must not exceed 100 MB");
+            return;
+        }
         setUploadError("");
         setUploading(true);
         try {
             const formData = new FormData();
             formData.append("image", file);
-            const res = await apiClient.post("upload/image", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            formData.append("folder", folder);
+            const res = await apiClient.post("upload/image", formData);
             const url = res.data?.data?.url;
             if (url)
                 onChange(url);
         }
-        catch {
-            setUploadError("Upload failed. Try again or use a URL instead.");
+        catch (uploadFailure) {
+            setUploadError(uploadFailure.response?.data?.error?.message ||
+                "Upload failed. Try again or use a URL instead.");
         }
         finally {
             setUploading(false);
