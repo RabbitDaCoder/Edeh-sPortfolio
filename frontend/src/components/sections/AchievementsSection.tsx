@@ -50,15 +50,15 @@ function AchievementMilestone({
 
           {/* Top row: icon + year */}
           <div className="flex items-center justify-between mb-3">
-            <span className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-background">
-              <Icon className="w-4 h-4 text-text-muted" />
-            </span>
             <Badge
               variant="outline"
               className="text-[10px] font-mono tracking-wider"
             >
               {formatDate(achievement.date)}
             </Badge>
+            <span className="flex items-center justify-center w-9 h-9 rounded-full border border-border bg-background">
+              <Icon className="w-4 h-4 text-text-muted" />
+            </span>
           </div>
 
           {/* Title */}
