@@ -9,6 +9,7 @@ export interface BlogPostData {
     category: string;
     featured?: boolean;
     coverColor?: string;
+    coverImage?: string;
 }
 interface FeaturedPostProps {
     post: BlogPostData;

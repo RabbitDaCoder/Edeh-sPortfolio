@@ -14,6 +14,7 @@ export interface BlogPostData {
   category: string;
   featured?: boolean;
   coverColor?: string;
+  coverImage?: string;
 }
 
 interface FeaturedPostProps {
@@ -33,10 +34,27 @@ export const FeaturedPost: React.FC<FeaturedPostProps> = ({ post }) => {
     >
       {/* Cover area */}
       <div className="w-full h-64 md:h-80 bg-surface flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent" />
-        <span className="text-display-lg font-serif text-text-muted/20 select-none">
+        {post.coverImage ? (
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent" />
+            <span className="text-display-lg font-serif text-text-muted/20 select-none">
+              Featured
+            </span>
+          </>
+        )}
+        <Badge
+          variant="default"
+          className="absolute top-4 left-4 shadow-sm backdrop-blur-sm"
+        >
           Featured
-        </span>
+        </Badge>
       </div>
 
       <div className="p-6 md:p-8 space-y-4">
